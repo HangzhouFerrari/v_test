@@ -370,6 +370,21 @@ function showCreateModal(id){
     }
     return term;
   }):[{term:'',def:''},{term:'',def:''}];
+
+  // Try to load draft if editing new set
+  if(!id){
+    const draft=JSON.parse(localStorage.getItem('sd_draft')||'null');
+    if(draft){
+      CE.pairs=draft.pairs;
+      document.getElementById('c-title')?.value=draft.title||'';
+      document.getElementById('c-vak')?.value=draft.vak||'';
+      document.getElementById('c-desc')?.value=draft.desc||'';
+      document.getElementById('c-datum')?.value=draft.datum||'';
+      showToast('📋 Concept hersteld!');
+      setTimeout(()=>localStorage.removeItem('sd_draft'),500); // Clear after loading
+    }
+  }
+
   showModal(`
     <h3>
       <span>${id?'Set bewerken':'Nieuwe set'}</span>
@@ -380,12 +395,12 @@ function showCreateModal(id){
       </div>
     </h3>
     <div class="two-col" style="margin-bottom:12px">
-      <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}"></div>
-      <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}"></div>
+      <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}" oninput="ceSaveDraft()"></div>
+      <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}" oninput="ceSaveDraft()"></div>
     </div>
     <div class="two-col" style="margin-bottom:16px">
-      <div class="input-group"><label>Omschrijving</label><textarea id="c-desc" style="min-height:56px">${esc(s?.description||'')}</textarea></div>
-      <div class="input-group"><label>Datum</label><input id="c-datum" type="date" value="${esc(s?.datum||'')}"></div>
+      <div class="input-group"><label>Omschrijving</label><textarea id="c-desc" style="min-height:56px" oninput="ceSaveDraft()">${esc(s?.description||'')}</textarea></div>
+      <div class="input-group"><label>Datum</label><input id="c-datum" type="date" value="${esc(s?.datum||'')}" oninput="ceSaveDraft()"></div>
     </div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
       <div style="font-size:15px;font-weight:800">Begrippen</div>
@@ -412,7 +427,7 @@ function showCreateModal(id){
 function showEditModal(id){showCreateModal(id);}
 
 /* ══ FORMATTING HELPERS ══ */
-const PRESET_COLORS=['#FF4444','#4499FF','#44CC44','#FFA500','#9944FF','#FF1493'];
+const PRESET_COLORS=['#000000','#FF4444','#4499FF','#44CC44','#FFA500','#9944FF','#FF1493'];
 
 function renderSegments(segments,plain=false){
   if(!segments||!segments.length)return'';
@@ -482,7 +497,10 @@ function ceRenderPairs(){
   const el=document.getElementById('ce-pairs');
   if(!el)return;
   const activeInputId=document.activeElement?.id;
-  el.innerHTML=CE.pairs.map((p,i)=>`
+  el.innerHTML=CE.pairs.map((p,i)=>{
+    const termPreview=p.activeTermBold||p.activeTermItalic||p.activeTermColor?`<span style="font-size:11px;padding:4px 8px;background:rgba(66,85,255,0.08);border-radius:4px;margin-top:4px;display:inline-block;color:#4255ff">${p.activeTermBold?'<b>B</b>':''} ${p.activeTermItalic?'<i>I</i>':''} ${p.activeTermColor?'●':''}</span>`:'';
+    const defPreview=p.activeDefBold||p.activeDefItalic||p.activeDefColor?`<span style="font-size:11px;padding:4px 8px;background:rgba(66,85,255,0.08);border-radius:4px;margin-top:4px;display:inline-block;color:#4255ff">${p.activeDefBold?'<b>B</b>':''} ${p.activeDefItalic?'<i>I</i>':''} ${p.activeDefColor?'●':''}</span>`:'';
+    return`
     <div class="pair-row" style="flex-wrap:wrap">
       <div class="pair-num">${i+1}</div>
       <div style="display:flex;flex-direction:column;gap:4px;grid-column:2">
@@ -491,12 +509,13 @@ function ceRenderPairs(){
           onfocus="document.getElementById('fmt-term-${i}').classList.add('show')"
           onblur="document.getElementById('fmt-term-${i}').classList.remove('show')"
           style="min-width:100%">
+        ${termPreview}
         <div class="format-toolbar" id="fmt-term-${i}" style="gap:4px">
           <div class="color-palette">${PRESET_COLORS.map(c=>`
             <div class="color-swatch ${p.activeTermColor===c?'active':''}" style="background:${c}" onmousedown="event.preventDefault();ceToggleColor(${i},'term','${c}');document.getElementById('ce-term-${i}').focus()" title="Kleur"></div>
           `).join('')}</div>
-          <button class="format-btn ${p.activeTermBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Vet">B</button>
-          <button class="format-btn ${p.activeTermItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Cursief">I</button>
+          <button class="format-btn ${p.activeTermBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Vet (Ctrl+B)">B</button>
+          <button class="format-btn ${p.activeTermItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Cursief (Ctrl+I)">I</button>
           <button class="image-upload-btn" style="margin-left:auto" onmousedown="event.preventDefault();ceUploadImage(${i},'term');document.getElementById('ce-term-${i}').focus()">🖼️ Afb.</button>
         </div>
         ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
@@ -507,19 +526,20 @@ function ceRenderPairs(){
           onfocus="document.getElementById('fmt-def-${i}').classList.add('show')"
           onblur="document.getElementById('fmt-def-${i}').classList.remove('show')"
           style="min-width:100%">
+        ${defPreview}
         <div class="format-toolbar" id="fmt-def-${i}" style="gap:4px">
           <div class="color-palette">${PRESET_COLORS.map(c=>`
             <div class="color-swatch ${p.activeDefColor===c?'active':''}" style="background:${c}" onmousedown="event.preventDefault();ceToggleColor(${i},'def','${c}');document.getElementById('ce-def-${i}').focus()" title="Kleur"></div>
           `).join('')}</div>
-          <button class="format-btn ${p.activeDefBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Vet">B</button>
-          <button class="format-btn ${p.activeDefItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Cursief">I</button>
+          <button class="format-btn ${p.activeDefBold?'active':''}" onmousedown="event.preventDefault();ceToggleBold(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Vet (Ctrl+B)">B</button>
+          <button class="format-btn ${p.activeDefItalic?'active':''}" onmousedown="event.preventDefault();ceToggleItalic(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Cursief (Ctrl+I)">I</button>
           <button class="image-upload-btn" style="margin-left:auto" onmousedown="event.preventDefault();ceUploadImage(${i},'def');document.getElementById('ce-def-${i}').focus()">🖼️ Afb.</button>
         </div>
         ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
       </div>
       <button class="pair-del" onclick="ceRemove(${i})">×</button>
     </div>
-  `).join('');
+  `}).join('');
   if(activeInputId) setTimeout(()=>{const el=document.getElementById(activeInputId); if(el) el.focus();},0);
 }
 
@@ -538,6 +558,8 @@ function ceHandleInput(idx,type,newText){
     const activeBold=type==='term'?pair.activeTermBold:pair.activeDefBold;
     const activeItalic=type==='term'?pair.activeTermItalic:pair.activeDefItalic;
 
+    console.log(`[ceHandleInput] ${type}[${idx}] - Bold:${activeBold} Italic:${activeItalic} Color:${activeColor}`);
+
     if(activeColor||activeBold||activeItalic){
       const segFieldKey=type==='term'?'termSegments':'defSegments';
       let segments=pair[segFieldKey]||[{text:oldText}];
@@ -545,11 +567,12 @@ function ceHandleInput(idx,type,newText){
       // Add new segment with formatting
       segments.push({
         text: addedText,
-        color: activeColor,
-        bold: activeBold,
-        italic: activeItalic
+        color: activeColor||undefined,
+        bold: activeBold||false,
+        italic: activeItalic||false
       });
       pair[segFieldKey]=segments;
+      console.log(`[ceHandleInput] Created segments for ${segFieldKey}:`, segments);
     } else {
       // Clear segments if no active formatting
       if(type==='term')delete pair.termSegments;
@@ -661,9 +684,22 @@ function ceSave(){
   }
 
   saveDB();
+  localStorage.removeItem('sd_draft'); // Clear draft on save
   closeModal();
   renderHome();
   showToast(CE.id?'✓ Set opgeslagen!':'✓ Set aangemaakt! ('+ set.id +')');
+}
+
+function ceSaveDraft(){
+  if(!CE.pairs)return;
+  const draft={
+    pairs: JSON.parse(JSON.stringify(CE.pairs)), // Deep copy
+    title: document.getElementById('c-title')?.value||'',
+    vak: document.getElementById('c-vak')?.value||'',
+    desc: document.getElementById('c-desc')?.value||'',
+    datum: document.getElementById('c-datum')?.value||''
+  };
+  localStorage.setItem('sd_draft', JSON.stringify(draft));
 }
 
 /* ══ IMPORT MODAL ══ */
