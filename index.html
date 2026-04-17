@@ -293,8 +293,8 @@ function renderGrid(sets){
       </div>
       <div class="set-card-actions" onclick="event.stopPropagation()">
         <button class="btn btn-glass btn-sm" onclick="openSet('${s.id}')">Oefenen</button>
-        <button class="btn btn-glass btn-sm" onclick="showEditModal('${s.id}')">Bewerken</button>
-        ${s.fromServer?`<span class="badge badge-gray" title="Server set - kan niet verwijderd worden">🔒 Geblokkeerd</span>`:`<button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>`}
+        ${!s.fromServer?`<button class="btn btn-glass btn-sm" onclick="showEditModal('${s.id}')">Bewerken</button>`:''}
+        ${!s.fromServer?`<button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>`:''}
       </div>
     </div>
   `).join('');
