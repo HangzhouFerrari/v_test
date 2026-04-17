@@ -128,9 +128,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       Nieuwe set
     </button>
-    <button class="btn-icon" onclick="showImportModal()" title="Importeren">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-    </button>
   </div>
 </nav>
 
@@ -142,10 +139,6 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
       <button class="btn btn-primary btn-lg" onclick="showCreateModal()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
         Nieuwe set
-      </button>
-      <button class="btn btn-glass btn-lg" onclick="showImportModal()">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Importeren
       </button>
     </div>
   </div>
@@ -222,10 +215,6 @@ function renderGrid(sets){
       <div class="set-card-actions" onclick="event.stopPropagation()">
         <button class="btn btn-glass btn-sm" onclick="openSet('${s.id}')">Oefenen</button>
         <button class="btn btn-glass btn-sm" onclick="showEditModal('${s.id}')">Bewerken</button>
-        <button class="btn btn-glass btn-sm" onclick="downloadVset('${s.id}')" title="Downloaden als .vset">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          .vset
-        </button>
         <button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>
       </div>
     </div>
@@ -249,19 +238,8 @@ function toSlug(str){
 }
 
 /* ══ DOWNLOAD .vset ══ */
-function downloadVset(id){
-  const s=DB.sets.find(x=>x.id===id);
-  if(!s)return;
-  const slug=s.slug||toSlug(s.title);
-  s.slug=slug;saveDB();
-  const encoded=encodeVset(s);
-  const blob=new Blob([encoded],{type:'application/octet-stream'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
-  a.download=slug+'.vset';
-  a.click();
-  showToast(`${slug}.vset gedownload — zet dit in de sets/ map`);
-}
+// Removed: Download functionality moved to developer.html for commercial use
+
 
 /* ══ CREATE MODAL ══ */
 let CE={id:null,pairs:[]};
@@ -337,64 +315,12 @@ function ceSave(){
   if(CE.id){const idx=DB.sets.findIndex(x=>x.id===CE.id);if(idx>-1)DB.sets[idx]=set;}
   else DB.sets.unshift(set);
   saveDB();closeModal();renderHome();
-  showToast(CE.id?'Set opgeslagen!':'Set aangemaakt! Download de .vset om hem te hosten.');
+  showToast(CE.id?'Set opgeslagen!':'Set aangemaakt!');
 }
 
 /* ══ IMPORT MODAL ══ */
-function showImportModal(){
-  showModal(`
-    <h3>Importeren</h3>
-    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Upload een .vset bestand of plak JSON-inhoud.</p>
-    <div class="input-group" style="margin-bottom:12px">
-      <label>Kies .vset bestand</label>
-      <input type="file" accept=".vset,.json" multiple onchange="importFiles(this)">
-    </div>
-    <div style="text-align:center;color:var(--text3);font-size:13px;margin:10px 0">— of JSON plakken —</div>
-    <div class="input-group" style="margin-bottom:16px">
-      <textarea id="imp-txt" style="min-height:100px;font-family:monospace;font-size:12px" placeholder='{"title":"Mijn set","terms":[{"term":"...","def":"..."}]}'></textarea>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-glass" onclick="closeModal()">Annuleren</button>
-      <button class="btn btn-primary" onclick="importPaste()">Importeren</button>
-    </div>
-  `);
-}
+// Removed: Import functionality moved to developer.html for commercial use
 
-function importFiles(inp){
-  [...inp.files].forEach(f=>{
-    const r=new FileReader();
-    r.onload=e=>{
-      let data;
-      try{
-        // Try .vset decode first, fall back to plain JSON
-        try{data=decodeVset(e.target.result.trim());}
-        catch{data=JSON.parse(e.target.result);}
-        const s=normalizeSet(data);
-        if(s){DB.sets.unshift(s);saveDB();showToast(`"${s.title}" geladen!`);closeModal();renderHome();}
-      }catch(err){showToast('Fout: '+err.message);}
-    };r.readAsText(f);
-  });
-}
-
-function importPaste(){
-  const raw=document.getElementById('imp-txt').value.trim();
-  if(!raw){showToast('Plak eerst iets');return;}
-  try{
-    let data;
-    try{data=decodeVset(raw);}catch{data=JSON.parse(raw);}
-    const s=normalizeSet(data);
-    if(s){DB.sets.unshift(s);saveDB();closeModal();showToast(`"${s.title}" geïmporteerd!`);renderHome();}
-  }catch(e){showToast('Ongeldige inhoud: '+e.message);}
-}
-
-function normalizeSet(data){
-  if(Array.isArray(data)){data.forEach(d=>DB.sets.unshift(normalizeSet(d)));return null;}
-  let terms=[];
-  if(Array.isArray(data.terms))terms=data.terms.map(t=>({term:(t.term||t.word||'').trim(),def:(t.def||t.definition||'').trim()}));
-  else if(typeof data.terms==='string')terms=data.terms.split('^').map(p=>{const[t,...r]=p.split('\\');return{term:(t||'').trim(),def:r.join('\\').trim()};});
-  if(!terms.filter(t=>t.term||t.def).length){showToast('Geen begrippen gevonden');return null;}
-  return{id:data.id||'imp_'+Date.now(),slug:data.slug||toSlug(data.title||'set'),title:data.title||'Geïmporteerde set',description:data.description||'',vak:data.vak||'',datum:data.datum||'',terms:terms.filter(t=>t.term||t.def)};
-}
 
 /* ══ DELETE ══ */
 function confirmDelete(id){
