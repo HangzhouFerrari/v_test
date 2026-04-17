@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyDeck</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-grad:linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%);
+  --glass:rgba(255,255,255,0.90);
+  --glass2:rgba(255,255,255,0.80);
+  --glass-border:rgba(200,195,230,0.6);
+  --glass-shadow:0 4px 24px rgba(80,60,160,0.10),inset 1px 1px 0 rgba(255,255,255,1);
+  --glass-shadow-lg:0 8px 40px rgba(80,60,160,0.14),inset 1px 1px 0 rgba(255,255,255,1);
+  --text:#0b0f2a;--text2:#3d3a55;--text3:#7c7899;
+  --accent:#4255ff;--accent2:#6b7bff;--accent-light:rgba(66,85,255,0.12);
+  --green:#18b672;--red:#e83a4a;--orange:#f07b20;
+  --r:20px;--r2:28px;--r3:14px;--r4:10px;
+  --font:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0,0,.47,1.15);
+  --ease2:cubic-bezier(0.34,1.56,0.64,1);
+}
+html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
+body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed}
+
+nav{
+  position:sticky;top:0;z-index:200;
+  background:rgba(240,238,249,0.92);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(200,195,230,0.5);
+  padding:0 28px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;}
+.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#4255ff,#6b7bff);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(66,85,255,0.35);}
+.nav-actions{display:flex;gap:8px;align-items:center}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
+.btn-primary{background:linear-gradient(180deg,#4255ff 0%,rgba(66,85,255,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(66,85,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.25);}
+.btn-primary:hover{filter:brightness(1.15);transform:scale(1.04) translateY(-1px)}
+.btn-glass{background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);color:var(--text);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;}
+.btn-glass:hover{background:rgba(255,255,255,0.95);transform:scale(1.04)}
+.btn-glass:active,.btn-primary:active{transform:scale(0.97)}
+.btn-lg{padding:13px 26px;font-size:16px;border-radius:var(--r)}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:var(--r4)}
+.btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;border-radius:12px;cursor:pointer;}
+.btn-icon:hover{background:rgba(255,255,255,0.95);transform:scale(1.08)}
+
+input,textarea,select{background:rgba(255,255,255,0.85);border:1px solid rgba(200,195,230,0.6);border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;padding:11px 16px;outline:none;transition:all .2s;width:100%;box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 6px rgba(80,60,160,0.06);}
+input:focus,textarea:focus,select:focus{border-color:#4255ff;background:rgba(255,255,255,0.98);box-shadow:0 0 0 3px rgba(66,85,255,0.12),inset 1px 1px 0 rgba(255,255,255,1);}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+.input-group{display:flex;flex-direction:column;gap:6px}
+.input-group label{font-size:13px;color:var(--text2);font-weight:600}
+
+.screen{padding:28px 32px;max-width:1100px;margin:0 auto;width:100%}
+
+@keyframes pageIn{from{opacity:0;transform:scale(0.94) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.page-enter{animation:pageIn .4s var(--ease2) both}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.home-hero{text-align:center;padding:40px 0 28px}
+.home-hero h1{font-size:46px;font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:10px}
+.home-hero h1 span{background:linear-gradient(135deg,#4255ff 0%,#a78bfa 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.home-hero p{color:var(--text2);font-size:17px;max-width:440px;margin:0 auto 28px}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+
+.sets-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-top:20px}
+.set-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);padding:22px;cursor:pointer;box-shadow:var(--glass-shadow);transition:all .25s var(--ease);position:relative;overflow:hidden;}
+.set-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#4255ff,#6b7bff);transform:scaleX(0);transform-origin:left;transition:.3s var(--ease)}
+.set-card:hover{transform:translateY(-4px) scale(1.01);box-shadow:var(--glass-shadow-lg)}
+.set-card:hover::after{transform:scaleX(1)}
+.set-card-title{font-size:17px;font-weight:800;margin-bottom:6px;letter-spacing:-0.3px}
+.set-card-desc{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5;min-height:32px}
+.set-card-meta{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.set-card-actions{display:flex;gap:6px;margin-top:14px;padding-top:12px;border-top:1px solid rgba(180,170,210,0.3)}
+
+.badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-purple{background:rgba(66,85,255,0.12);color:#4255ff}
+.badge-orange{background:rgba(240,123,32,0.12);color:var(--orange)}
+.badge-gray{background:rgba(120,110,150,0.12);color:var(--text2)}
+
+/* Modal */
+.modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
+.modal-panel{background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);}
+.modal-panel h3{font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(180,170,210,0.2)}
+
+/* Pair rows */
+.pair-row{display:grid;grid-template-columns:30px 1fr 1fr 28px;gap:8px;align-items:center;margin-bottom:8px}
+.pair-num{width:28px;height:28px;border-radius:50%;background:rgba(66,85,255,0.1);color:#4255ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.pair-del{width:26px;height:26px;border-radius:50%;background:none;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s}
+.pair-del:hover{color:var(--red);background:rgba(232,58,74,0.1)}
+
+/* Toast */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,0.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* Download banner */
+.dl-banner{background:rgba(66,85,255,0.08);border:1px solid rgba(66,85,255,0.2);border-radius:var(--r);padding:14px 18px;margin-top:10px;font-size:13px;color:var(--text2);display:flex;align-items:center;gap:10px}
+.dl-banner code{background:rgba(66,85,255,0.1);padding:2px 8px;border-radius:6px;font-size:12px;color:#4255ff;font-family:monospace}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-hdr h3{font-size:20px;font-weight:800;letter-spacing:-0.3px}
+.hidden{display:none!important}
+.text-muted{color:var(--text2)}.text-sm{font-size:13px}.text-xs{font-size:11px}
+
+@media(max-width:640px){
+  nav{padding:0 16px}
+  .screen{padding:16px}
+  .home-hero h1{font-size:32px}
+  .two-col{grid-template-columns:1fr}
+  .pair-row{grid-template-columns:28px 1fr 26px;grid-template-rows:auto auto}
+  .pair-row input:nth-child(3){grid-column:2}
+}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">
+    <div class="nav-logo-icon">📚</div>
+    StudyDeck
+  </div>
+  <div class="nav-actions">
+    <button class="btn btn-primary btn-sm" onclick="showCreateModal()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      Nieuwe set
+    </button>
+    <button class="btn-icon" onclick="showImportModal()" title="Importeren">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    </button>
+  </div>
+</nav>
+
+<div class="screen page-enter">
+  <div class="home-hero">
+    <h1>Leer slimmer,<br><span>niet harder</span></h1>
+    <p>Maak een set, deel de link, en oefen overal.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary btn-lg" onclick="showCreateModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Nieuwe set
+      </button>
+      <button class="btn btn-glass btn-lg" onclick="showImportModal()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Importeren
+      </button>
+    </div>
+  </div>
+
+  <div id="filter-bar" class="hidden" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center"></div>
+  <div class="sets-grid" id="sets-grid"></div>
+</div>
+
+<!-- Modal -->
+<div id="modal-bg" class="modal-bg hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal-panel" id="modal-panel"></div>
+</div>
+<div id="toast"></div>
+
+<script>
+/* ══ OBFUSCATION KEY ══
+   .vset files are base64-encoded JSON with a simple XOR pass.
+   The key is split so it's not trivially readable in source.
+*/
+const _k=['S','t','u','d','y','D','e','c','k','V','S','e','t','2','0','2','5'];
+const VSET_KEY=_k.join('');
+
+function xorStr(str,key){
+  return str.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^key.charCodeAt(i%key.length))).join('');
+}
+function encodeVset(obj){
+  const json=JSON.stringify(obj);
+  const xored=xorStr(json,VSET_KEY);
+  return btoa(unescape(encodeURIComponent(xored)));
+}
+function decodeVset(b64){
+  const xored=decodeURIComponent(escape(atob(b64)));
+  return JSON.parse(xorStr(xored,VSET_KEY));
+}
+
+/* ══ DB ══ */
+let DB={sets:[]};
+function initDB(){try{DB.sets=JSON.parse(localStorage.getItem('sd_sets')||'[]');}catch(e){DB.sets=[];}}
+function saveDB(){try{localStorage.setItem('sd_sets',JSON.stringify(DB.sets));}catch(e){}}
+
+/* ══ RENDER ══ */
+function renderHome(){
+  const vakken=[...new Set(DB.sets.map(s=>s.vak).filter(Boolean))];
+  const fb=document.getElementById('filter-bar');
+  if(vakken.length){
+    fb.classList.remove('hidden');
+    fb.style.display='flex';
+    fb.innerHTML=`<span style="font-size:13px;color:var(--text2);font-weight:700">Filter:</span>
+      <button class="btn btn-glass btn-sm" onclick="renderGrid(DB.sets)" style="border-radius:20px">Alle</button>
+      ${vakken.map(v=>`<button class="btn btn-glass btn-sm" onclick="renderGrid(DB.sets.filter(s=>s.vak==='${esc(v)}'))" style="border-radius:20px">${esc(v)}</button>`).join('')}`;
+  }
+  renderGrid(DB.sets);
+}
+
+function renderGrid(sets){
+  const el=document.getElementById('sets-grid');
+  if(!sets.length){
+    el.innerHTML=`<div style="text-align:center;padding:60px 20px;color:var(--text2);grid-column:1/-1">
+      <div style="font-size:48px;margin-bottom:16px">📚</div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:8px">Geen sets</div>
+      <p>Maak een nieuwe set aan of importeer een .vset bestand.</p>
+    </div>`;
+    return;
+  }
+  el.innerHTML=sets.map(s=>`
+    <div class="set-card" onclick="openSet('${s.id}')">
+      <div class="set-card-title">${esc(s.title)}</div>
+      <div class="set-card-desc">${esc(s.description||'')}</div>
+      <div class="set-card-meta">
+        <span class="badge badge-purple">${s.terms.length} begrippen</span>
+        ${s.vak?`<span class="badge badge-orange">${esc(s.vak)}</span>`:''}
+        ${s.datum?`<span style="font-size:11px;color:var(--text3)">${s.datum}</span>`:''}
+      </div>
+      <div class="set-card-actions" onclick="event.stopPropagation()">
+        <button class="btn btn-glass btn-sm" onclick="openSet('${s.id}')">Oefenen</button>
+        <button class="btn btn-glass btn-sm" onclick="showEditModal('${s.id}')">Bewerken</button>
+        <button class="btn btn-glass btn-sm" onclick="downloadVset('${s.id}')" title="Downloaden als .vset">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          .vset
+        </button>
+        <button class="btn btn-sm" style="background:rgba(232,58,74,0.1);color:var(--red);border:none;border-radius:8px;padding:6px 10px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="confirmDelete('${s.id}')">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function openSet(id){
+  const s=DB.sets.find(x=>x.id===id);
+  if(!s)return;
+  // Derive slug from title (or id)
+  const slug=s.slug||toSlug(s.title);
+  s.slug=slug;saveDB();
+  window.location.href=`set.html?set=${encodeURIComponent(slug)}`;
+}
+
+function toSlug(str){
+  return str.toLowerCase()
+    .replace(/[àáâäãåā]/g,'a').replace(/[èéêëē]/g,'e').replace(/[ìíîïī]/g,'i')
+    .replace(/[òóôöõøō]/g,'o').replace(/[ùúûüū]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').slice(0,60)||'set-'+Date.now();
+}
+
+/* ══ DOWNLOAD .vset ══ */
+function downloadVset(id){
+  const s=DB.sets.find(x=>x.id===id);
+  if(!s)return;
+  const slug=s.slug||toSlug(s.title);
+  s.slug=slug;saveDB();
+  const encoded=encodeVset(s);
+  const blob=new Blob([encoded],{type:'application/octet-stream'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download=slug+'.vset';
+  a.click();
+  showToast(`${slug}.vset gedownload — zet dit in de sets/ map`);
+}
+
+/* ══ CREATE MODAL ══ */
+let CE={id:null,pairs:[]};
+
+function showCreateModal(id){
+  CE.id=id||null;
+  const s=id?DB.sets.find(x=>x.id===id):null;
+  CE.pairs=s?s.terms.map(t=>({...t})):[{term:'',def:''},{term:'',def:''}];
+  showModal(`
+    <h3>${id?'Set bewerken':'Nieuwe set'}</h3>
+    <div class="two-col" style="margin-bottom:12px">
+      <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}"></div>
+      <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}"></div>
+    </div>
+    <div class="two-col" style="margin-bottom:16px">
+      <div class="input-group"><label>Omschrijving</label><textarea id="c-desc" style="min-height:56px">${esc(s?.description||'')}</textarea></div>
+      <div class="input-group"><label>Datum</label><input id="c-datum" type="date" value="${esc(s?.datum||'')}"></div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+      <div style="font-size:15px;font-weight:800">Begrippen</div>
+      <button class="btn btn-glass btn-sm" onclick="ceAdd()">+ Toevoegen</button>
+    </div>
+    <div style="display:grid;grid-template-columns:30px 1fr 1fr 26px;gap:6px;margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(180,170,210,0.2)">
+      <div></div>
+      <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Begrip</div>
+      <div style="font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.5px">Definitie</div>
+      <div></div>
+    </div>
+    <div id="ce-pairs" style="max-height:280px;overflow-y:auto;padding-right:4px"></div>
+    <button class="btn btn-glass" style="width:100%;margin-top:8px" onclick="ceAdd()">+ Begrip toevoegen</button>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="ceSave()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        ${id?'Opslaan':'Aanmaken'}
+      </button>
+    </div>
+  `);
+  ceRenderPairs();
+}
+function showEditModal(id){showCreateModal(id);}
+
+function ceRenderPairs(){
+  const el=document.getElementById('ce-pairs');
+  if(!el)return;
+  el.innerHTML=CE.pairs.map((p,i)=>`
+    <div class="pair-row">
+      <div class="pair-num">${i+1}</div>
+      <input type="text" placeholder="Begrip" value="${esc(p.term)}" oninput="CE.pairs[${i}].term=this.value">
+      <input type="text" placeholder="Definitie" value="${esc(p.def)}" oninput="CE.pairs[${i}].def=this.value">
+      <button class="pair-del" onclick="ceRemove(${i})">×</button>
+    </div>
+  `).join('');
+}
+function ceAdd(){CE.pairs.push({term:'',def:''});ceRenderPairs();setTimeout(()=>{const rows=document.querySelectorAll('#ce-pairs .pair-row');rows[rows.length-1]?.querySelector('input')?.focus();},50);}
+function ceRemove(i){if(CE.pairs.length<=1){showToast('Minimaal 1 begrip vereist');return;}CE.pairs.splice(i,1);ceRenderPairs();}
+
+function ceSave(){
+  const title=document.getElementById('c-title').value.trim();
+  if(!title){showToast('Vul een titel in');return;}
+  const terms=CE.pairs.filter(p=>p.term.trim()||p.def.trim()).map(p=>({term:p.term.trim(),def:p.def.trim()}));
+  if(!terms.length){showToast('Voeg minimaal 1 begrip toe');return;}
+  const existing=CE.id?DB.sets.find(x=>x.id===CE.id):null;
+  const slug=existing?.slug||toSlug(title);
+  const set={
+    id:CE.id||'set_'+Date.now(),
+    slug,title,
+    description:document.getElementById('c-desc').value.trim(),
+    vak:document.getElementById('c-vak').value.trim(),
+    datum:document.getElementById('c-datum').value,
+    terms
+  };
+  if(CE.id){const idx=DB.sets.findIndex(x=>x.id===CE.id);if(idx>-1)DB.sets[idx]=set;}
+  else DB.sets.unshift(set);
+  saveDB();closeModal();renderHome();
+  showToast(CE.id?'Set opgeslagen!':'Set aangemaakt! Download de .vset om hem te hosten.');
+}
+
+/* ══ IMPORT MODAL ══ */
+function showImportModal(){
+  showModal(`
+    <h3>Importeren</h3>
+    <p style="font-size:13px;color:var(--text2);margin-bottom:16px">Upload een .vset bestand of plak JSON-inhoud.</p>
+    <div class="input-group" style="margin-bottom:12px">
+      <label>Kies .vset bestand</label>
+      <input type="file" accept=".vset,.json" multiple onchange="importFiles(this)">
+    </div>
+    <div style="text-align:center;color:var(--text3);font-size:13px;margin:10px 0">— of JSON plakken —</div>
+    <div class="input-group" style="margin-bottom:16px">
+      <textarea id="imp-txt" style="min-height:100px;font-family:monospace;font-size:12px" placeholder='{"title":"Mijn set","terms":[{"term":"...","def":"..."}]}'></textarea>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal()">Annuleren</button>
+      <button class="btn btn-primary" onclick="importPaste()">Importeren</button>
+    </div>
+  `);
+}
+
+function importFiles(inp){
+  [...inp.files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{
+      let data;
+      try{
+        // Try .vset decode first, fall back to plain JSON
+        try{data=decodeVset(e.target.result.trim());}
+        catch{data=JSON.parse(e.target.result);}
+        const s=normalizeSet(data);
+        if(s){DB.sets.unshift(s);saveDB();showToast(`"${s.title}" geladen!`);closeModal();renderHome();}
+      }catch(err){showToast('Fout: '+err.message);}
+    };r.readAsText(f);
+  });
+}
+
+function importPaste(){
+  const raw=document.getElementById('imp-txt').value.trim();
+  if(!raw){showToast('Plak eerst iets');return;}
+  try{
+    let data;
+    try{data=decodeVset(raw);}catch{data=JSON.parse(raw);}
+    const s=normalizeSet(data);
+    if(s){DB.sets.unshift(s);saveDB();closeModal();showToast(`"${s.title}" geïmporteerd!`);renderHome();}
+  }catch(e){showToast('Ongeldige inhoud: '+e.message);}
+}
+
+function normalizeSet(data){
+  if(Array.isArray(data)){data.forEach(d=>DB.sets.unshift(normalizeSet(d)));return null;}
+  let terms=[];
+  if(Array.isArray(data.terms))terms=data.terms.map(t=>({term:(t.term||t.word||'').trim(),def:(t.def||t.definition||'').trim()}));
+  else if(typeof data.terms==='string')terms=data.terms.split('^').map(p=>{const[t,...r]=p.split('\\');return{term:(t||'').trim(),def:r.join('\\').trim()};});
+  if(!terms.filter(t=>t.term||t.def).length){showToast('Geen begrippen gevonden');return null;}
+  return{id:data.id||'imp_'+Date.now(),slug:data.slug||toSlug(data.title||'set'),title:data.title||'Geïmporteerde set',description:data.description||'',vak:data.vak||'',datum:data.datum||'',terms:terms.filter(t=>t.term||t.def)};
+}
+
+/* ══ DELETE ══ */
+function confirmDelete(id){
+  showModal(`
+    <h3>Set verwijderen?</h3>
+    <p style="color:var(--text2);margin-bottom:20px">Dit kan niet ongedaan worden gemaakt.</p>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal()">Annuleren</button>
+      <button class="btn" style="background:var(--red);color:#fff;border:none;border-radius:var(--r3);padding:9px 18px;font-family:var(--font);font-weight:700;cursor:pointer" onclick="doDelete('${id}')">Verwijderen</button>
+    </div>
+  `);
+}
+function doDelete(id){DB.sets=DB.sets.filter(s=>s.id!==id);saveDB();closeModal();renderHome();showToast('Set verwijderd');}
+
+/* ══ MODAL ══ */
+function showModal(html){document.getElementById('modal-panel').innerHTML=html;document.getElementById('modal-bg').classList.remove('hidden');}
+function closeModal(){document.getElementById('modal-bg').classList.add('hidden');}
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+/* ══ TOAST ══ */
+let _tt;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2800);}
+
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
+/* ══ BOOT ══ */
+initDB();
+renderHome();
+</script>
+</body>
+</html>

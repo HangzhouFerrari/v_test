@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StudyDeck — Laden…</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-grad:linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%);
+  --glass:rgba(255,255,255,0.90);
+  --glass-border:rgba(200,195,230,0.6);
+  --glass-shadow:0 4px 24px rgba(80,60,160,0.10),inset 1px 1px 0 rgba(255,255,255,1);
+  --glass-shadow-lg:0 8px 40px rgba(80,60,160,0.14),inset 1px 1px 0 rgba(255,255,255,1);
+  --text:#0b0f2a;--text2:#3d3a55;--text3:#7c7899;
+  --accent:#4255ff;--accent2:#6b7bff;--accent-light:rgba(66,85,255,0.12);
+  --green:#18b672;--green-light:rgba(24,182,114,0.15);
+  --red:#e83a4a;--red-light:rgba(232,58,74,0.12);
+  --orange:#f07b20;
+  --r:20px;--r2:28px;--r3:14px;--r4:10px;
+  --font:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0,0,.47,1.15);
+  --ease2:cubic-bezier(0.34,1.56,0.64,1);
+}
+html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
+body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed}
+
+nav{position:sticky;top:0;z-index:200;background:rgba(240,238,249,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,195,230,0.5);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
+.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,#4255ff,#6b7bff);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(66,85,255,0.35);}
+.nav-set-title{font-size:14px;font-weight:700;color:var(--text2);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
+.btn-primary{background:linear-gradient(180deg,#4255ff 0%,rgba(66,85,255,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(66,85,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.25);}
+.btn-primary:hover{filter:brightness(1.15);transform:scale(1.04) translateY(-1px)}
+.btn-glass{background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);color:var(--text);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;}
+.btn-glass:hover{background:rgba(255,255,255,0.95);transform:scale(1.04)}
+.btn-primary:active,.btn-glass:active{transform:scale(0.97)}
+.btn-green{background:linear-gradient(180deg,var(--green) 0%,rgba(24,182,114,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(24,182,114,0.35)}
+.btn-green:hover{filter:brightness(1.15);transform:scale(1.04)}
+.btn-red{background:linear-gradient(180deg,var(--red) 0%,rgba(232,58,74,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(232,58,74,0.3)}
+.btn-red:hover{filter:brightness(1.15);transform:scale(1.04)}
+.btn-lg{padding:13px 26px;font-size:16px;border-radius:var(--r)}
+.btn-sm{padding:6px 12px;font-size:13px;border-radius:var(--r4)}
+.btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;border-radius:12px;cursor:pointer;}
+.btn-icon:hover{background:rgba(255,255,255,0.95);transform:scale(1.08)}
+
+input,textarea,select{background:rgba(255,255,255,0.85);border:1px solid rgba(200,195,230,0.6);border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;padding:11px 16px;outline:none;transition:all .2s;width:100%;box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 6px rgba(80,60,160,0.06);}
+input:focus,textarea:focus,select:focus{border-color:#4255ff;background:rgba(255,255,255,0.98);box-shadow:0 0 0 3px rgba(66,85,255,0.12),inset 1px 1px 0 rgba(255,255,255,1);}
+
+.toggle{position:relative;width:46px;height:26px;cursor:pointer;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0;position:absolute}
+.toggle-slider{position:absolute;inset:0;background:rgba(180,170,210,0.5);border-radius:13px;transition:.25s;}
+.toggle-slider::after{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;background:#fff;border-radius:50%;transition:.25s var(--ease2);box-shadow:0 2px 6px rgba(80,60,160,0.2);}
+.toggle input:checked+.toggle-slider{background:#4255ff}
+.toggle input:checked+.toggle-slider::after{transform:translateX(20px)}
+
+#app{min-height:100vh;display:flex;flex-direction:column}
+.screen{flex:1;padding:28px 32px;max-width:1100px;margin:0 auto;width:100%}
+
+@keyframes pageIn{from{opacity:0;transform:scale(0.94) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.page-enter{animation:pageIn .4s var(--ease2) both}
+@keyframes iosOpen{from{opacity:0;transform:scale(0.6) translateY(40px)}to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes cardLeft{from{opacity:0;transform:translateX(60px) scale(0.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes cardRight{from{opacity:0;transform:translateX(-60px) scale(0.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fbIn{from{opacity:0;transform:scale(0.95) translateY(-4px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
+/* ── VIEWS ── */
+#view-home,#view-set,#view-flashcards,#view-stampen,#view-overhoren{
+  display:none;
+}
+#view-home.active,#view-set.active,#view-flashcards.active,#view-stampen.active,#view-overhoren.active{
+  display:block;
+}
+
+/* ── SET DETAIL ── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:none;cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;color:var(--text2);padding:6px 0;margin-bottom:20px;transition:color .15s}
+.back-btn:hover{color:var(--text)}
+.set-detail-title{font-size:34px;font-weight:800;letter-spacing:-1px;margin-bottom:8px}
+.mode-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:32px}
+.mode-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);padding:22px 18px;cursor:pointer;text-align:center;box-shadow:var(--glass-shadow);transition:all .2s var(--ease);}
+.mode-card:hover{transform:translateY(-4px) scale(1.04);box-shadow:var(--glass-shadow-lg);background:rgba(255,255,255,0.98)}
+.mode-card:active{transform:scale(0.97)}
+.mode-card-icon{font-size:30px;margin-bottom:10px}
+.mode-card-title{font-weight:800;font-size:16px;margin-bottom:3px}
+.mode-card-desc{font-size:12px;color:var(--text2)}
+
+.terms-list{display:flex;flex-direction:column;gap:8px}
+.term-item{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:16px 20px;box-shadow:var(--glass-shadow);display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;}
+.term-divider{width:1px;min-height:24px;background:rgba(66,85,255,0.2);align-self:stretch}
+.term-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:700}
+
+.badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700}
+.badge-purple{background:rgba(66,85,255,0.12);color:#4255ff}
+.badge-orange{background:rgba(240,123,32,0.12);color:var(--orange)}
+.badge-gray{background:rgba(120,110,150,0.12);color:var(--text2)}
+
+/* ── PROGRESS + STREAK ── */
+.progress-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.progress-track{flex:1;height:8px;background:rgba(180,170,210,0.25);border-radius:4px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#4255ff,#6b7bff);border-radius:4px;transition:width .5s var(--ease)}
+.streak-circle{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;background:var(--glass);border:2px solid var(--glass-border);box-shadow:var(--glass-shadow);position:relative;transition:all .3s var(--ease2);color:var(--text2);}
+.streak-circle.on-fire{background:linear-gradient(135deg,#ffe5c0,#ffcb87);border-color:rgba(255,160,50,0.7);box-shadow:0 0 18px rgba(255,120,30,0.35),0 4px 12px rgba(255,120,30,0.2);animation:pulseFlame 1.5s ease-in-out infinite;color:transparent;}
+.streak-circle.on-fire .streak-num{display:none}
+.streak-circle.on-fire svg.flame-icon{display:block}
+svg.flame-icon{width:22px;height:22px;display:none}
+.flame-icon .f1{animation:flicker1 0.8s ease-in-out infinite alternate}
+.flame-icon .f2{animation:flicker2 1.1s ease-in-out infinite alternate}
+@keyframes pulseFlame{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+@keyframes flicker1{from{transform-origin:50% 100%;transform:scaleX(1) scaleY(1)}to{transform-origin:50% 100%;transform:scaleX(0.92) scaleY(1.06)}}
+@keyframes flicker2{from{transform-origin:50% 100%;transform:scaleX(1) scaleY(1)}to{transform-origin:50% 100%;transform:scaleX(1.05) scaleY(0.94)}}
+
+/* ── FLASHCARDS ── */
+.fc-wrap{max-width:620px;margin:0 auto;position:relative}
+.fc-card-scene{perspective:1400px;height:300px;cursor:pointer;margin-bottom:20px;user-select:none}
+.fc-card-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,0,.2,1)}
+.fc-card-inner.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:#f6f4ff;border:1.5px solid rgba(200,195,230,0.7);border-radius:var(--r2);box-shadow:var(--glass-shadow-lg);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px;text-align:center;}
+.fc-face-back{transform:rotateY(180deg);background:#eef4ff;}
+.fc-face-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:14px}
+.fc-face-text{font-size:24px;font-weight:800;line-height:1.3;letter-spacing:-0.3px}
+
+/* ── STAMPEN ── */
+.st-wrap{max-width:600px;margin:0 auto;position:relative}
+.st-qbox{background:var(--glass);border:1.5px solid var(--glass-border);border-radius:var(--r2);padding:32px;text-align:center;box-shadow:var(--glass-shadow-lg);margin-bottom:20px;}
+.st-qlabel{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;margin-bottom:12px}
+.st-qtext{font-size:22px;font-weight:800;line-height:1.3;letter-spacing:-0.3px}
+.st-feedback{padding:14px;border-radius:var(--r);text-align:center;font-weight:700;margin-bottom:14px;animation:fbIn .25s var(--ease2);font-size:15px;}
+.fb-correct{background:rgba(24,182,114,0.18);color:var(--green);border:1px solid rgba(24,182,114,0.4)}
+.fb-wrong{background:rgba(232,58,74,0.14);color:var(--red);border:1px solid rgba(232,58,74,0.3)}
+.fb-override-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid rgba(24,182,114,0.4);border-radius:8px;padding:5px 12px;font-family:var(--font);font-size:13px;font-weight:700;color:var(--green);cursor:pointer;margin-top:8px;transition:all .15s;}
+.fb-override-btn:hover{background:var(--green-light)}
+.st-hint-btn{background:none;border:1px dashed rgba(66,85,255,0.3);border-radius:8px;padding:6px 14px;font-family:var(--font);font-size:13px;font-weight:600;color:#4255ff;cursor:pointer;transition:all .15s;}
+.st-hint-btn:hover{background:var(--accent-light)}
+
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-box{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--glass-shadow);}
+.stat-num{font-size:26px;font-weight:800;line-height:1}
+.stat-label{font-size:12px;color:var(--text2);margin-top:3px;font-weight:600}
+.stat-green{color:var(--green)}.stat-red{color:var(--red)}.stat-blue{color:#4255ff}
+
+/* ── MC OPTIONS ── */
+.mc-options{display:flex;flex-direction:column;gap:8px;margin-bottom:16px}
+.mc-option{background:var(--glass);border:1.5px solid var(--glass-border);border-radius:var(--r);padding:14px 18px;cursor:pointer;transition:all .15s;font-size:15px;font-weight:600;display:flex;gap:12px;align-items:center;box-shadow:var(--glass-shadow);text-align:left;color:var(--text);}
+.mc-option:hover:not(.disabled):not(.sel-correct):not(.sel-wrong){background:rgba(255,255,255,0.95);transform:translateY(-2px);box-shadow:var(--glass-shadow-lg)}
+.mc-option.sel-correct{background:rgba(24,182,114,0.18)!important;border-color:var(--green)!important;color:var(--green)!important}
+.mc-option.sel-wrong{background:rgba(232,58,74,0.15)!important;border-color:var(--red)!important;color:var(--red)!important}
+.mc-option.reveal{background:rgba(24,182,114,0.1)!important;border-color:rgba(24,182,114,0.5)!important;color:var(--green)!important}
+.mc-letter{width:30px;height:30px;border-radius:50%;background:rgba(66,85,255,0.1);color:#4255ff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+
+/* ── OVERHOREN ── */
+.exam-info{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;box-shadow:var(--glass-shadow);display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);font-weight:600;}
+.exam-review-item{border-radius:var(--r);padding:14px;margin-bottom:8px;}
+.exam-review-correct{background:rgba(24,182,114,0.12);border:1px solid rgba(24,182,114,0.25)}
+.exam-review-wrong{background:rgba(232,58,74,0.10);border:1px solid rgba(232,58,74,0.2)}
+
+/* ── CHECKPOINT ── */
+.checkpoint-overlay{position:fixed;inset:0;z-index:5000;background:rgba(220,215,240,0.75);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:center;animation:fadeIn .3s;}
+.checkpoint-panel{background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:32px;width:90%;max-width:560px;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .4s var(--ease2);max-height:90vh;overflow-y:auto;}
+.cp-term{border-radius:var(--r);padding:12px 14px;font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.cp-term.known{background:rgba(24,182,114,0.15);color:var(--green);border:1px solid rgba(24,182,114,0.3)}
+.cp-term.unknown{background:rgba(232,58,74,0.12);color:var(--red);border:1px solid rgba(232,58,74,0.25)}
+
+/* ── MILESTONE ── */
+#milestone-overlay{position:fixed;inset:0;z-index:9000;pointer-events:none;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;}
+#milestone-overlay.active{opacity:1;pointer-events:auto}
+.milestone-panel{background:rgba(255,255,255,0.98);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:36px 48px;box-shadow:0 20px 80px rgba(80,60,160,0.25);text-align:center;animation:msIn .4s var(--ease2);}
+@keyframes msIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
+.milestone-num{font-size:64px;font-weight:800;line-height:1;color:#4255ff;margin-bottom:4px}
+.milestone-text{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
+
+/* ── SETTINGS DROPDOWN ── */
+.settings-dropdown-wrap{position:relative}
+.settings-dropdown{position:absolute;top:calc(100% + 8px);right:0;z-index:500;background:rgba(252,251,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r2);padding:16px;box-shadow:0 12px 48px rgba(80,60,160,0.18);width:280px;transform-origin:top right;animation:dropIn .25s var(--ease2) both;}
+@keyframes dropIn{from{opacity:0;transform:scale(0.88) translateY(-8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.settings-dropdown.hiding{animation:dropOut .18s ease both}
+@keyframes dropOut{from{opacity:1;transform:scale(1)}to{opacity:0;transform:scale(0.9) translateY(-6px)}}
+.settings-section{margin-bottom:12px}.settings-section:last-child{margin-bottom:0}
+.settings-section-title{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--text3);margin-bottom:8px;padding:0 2px}
+.settings-row{display:flex;align-items:center;justify-content:space-between;padding:6px 2px;border-bottom:1px solid rgba(180,170,210,0.2)}
+.settings-row:last-child{border-bottom:none}
+.settings-row-label{font-size:14px;font-weight:600;color:var(--text)}
+.settings-select{background:rgba(255,255,255,0.9);border:1px solid rgba(200,195,225,0.6);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;width:auto;}
+
+/* ── RESULTS OVERLAY ── */
+.results-overlay{position:absolute;inset:0;z-index:10;background:rgba(248,246,255,0.99);border-radius:var(--r2);display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px;text-align:center;animation:slideUp .4s var(--ease2)}
+.results-pct{font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,#4255ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.wrong-item{border-radius:var(--r);padding:12px 16px;margin-bottom:6px;background:rgba(232,58,74,0.1);border:1px solid rgba(232,58,74,0.2)}
+
+/* ── ENCOURAGE ── */
+.encourage{position:fixed;top:28%;left:50%;transform:translate(-50%,-50%);z-index:8999;pointer-events:none;font-size:22px;font-weight:800;color:#4255ff;text-shadow:0 2px 12px rgba(66,85,255,0.3);animation:encourageAnim .9s var(--ease2) both;}
+@keyframes encourageAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(0.95)}}
+
+/* ── LOADING / ERROR ── */
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center}
+.loading-spinner{width:48px;height:48px;border:4px solid rgba(66,85,255,0.15);border-top-color:#4255ff;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,0.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
+#toast.show{opacity:1;transform:translateY(0)}
+
+.section-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.section-hdr h3{font-size:20px;font-weight:800;letter-spacing:-0.3px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.shake-anim{animation:shake .35s}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+
+@media(max-width:640px){
+  nav{padding:0 16px}
+  .screen{padding:16px}
+  .mode-grid,.two-col{grid-template-columns:1fr}
+  .nav-set-title{display:none}
+}
+</style>
+</head>
+<body>
+<div id="app">
+<nav>
+  <a class="nav-logo" href="index.html">
+    <div class="nav-logo-icon">📚</div>
+    StudyDeck
+  </a>
+  <div id="nav-set-title" class="nav-set-title"></div>
+  <div style="width:40px"></div>
+</nav>
+
+<div class="screen" id="main-screen">
+  <div class="loading-screen" id="loading">
+    <div class="loading-spinner"></div>
+    <div style="font-size:16px;font-weight:700;color:var(--text2)">Set laden…</div>
+  </div>
+</div>
+</div>
+
+<!-- Milestone overlay -->
+<div id="milestone-overlay">
+  <div class="milestone-panel" id="milestone-panel"></div>
+</div>
+<div id="modal-bg" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);align-items:center;justify-content:center;" onclick="if(event.target===this)closeModal()">
+  <div style="background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:28px;width:90%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);" id="modal-panel"></div>
+</div>
+<div id="toast"></div>
+<div id="checkpoint-layer"></div>
+
+<script>
+/* ══════════════════════════════════════════
+   VSET DECODE
+══════════════════════════════════════════ */
+const _k=['S','t','u','d','y','D','e','c','k','V','S','e','t','2','0','2','5'];
+const VSET_KEY=_k.join('');
+
+function xorStr(str,key){
+  return str.split('').map((c,i)=>String.fromCharCode(c.charCodeAt(0)^key.charCodeAt(i%key.length))).join('');
+}
+function decodeVset(b64){
+  const xored=decodeURIComponent(escape(atob(b64.trim())));
+  return JSON.parse(xorStr(xored,VSET_KEY));
+}
+function encodeVset(obj){
+  const json=JSON.stringify(obj);
+  const xored=xorStr(json,VSET_KEY);
+  return btoa(unescape(encodeURIComponent(xored)));
+}
+
+/* ══════════════════════════════════════════
+   LOAD SET
+   Priority:
+   1. ?set=slug  →  fetch sets/{slug}.vset
+   2. Fall back to localStorage (for sets created on index.html)
+══════════════════════════════════════════ */
+let SET=null;// current set data
+let currentMode='home';// home | flashcards | stampen | overhoren
+
+async function boot(){
+  const params=new URLSearchParams(window.location.search);
+  const slug=params.get('set');
+  if(!slug){showError('Geen set opgegeven. Ga terug naar de <a href="index.html">startpagina</a>.');return;}
+
+  // 1. Try to fetch .vset file
+  try{
+    const resp=await fetch(`sets/${encodeURIComponent(slug)}.vset`);
+    if(resp.ok){
+      const raw=await resp.text();
+      try{SET=decodeVset(raw);}
+      catch{SET=JSON.parse(raw);} // plain JSON fallback
+      renderSetView();
+      return;
+    }
+  }catch(e){}
+
+  // 2. Fall back to localStorage
+  try{
+    const stored=JSON.parse(localStorage.getItem('sd_sets')||'[]');
+    const found=stored.find(s=>s.slug===slug||s.id===slug||toSlug(s.title)===slug);
+    if(found){SET=found;renderSetView();return;}
+  }catch(e){}
+
+  showError(`Set "<strong>${esc(slug)}</strong>" niet gevonden.<br>Zorg dat <code>sets/${esc(slug)}.vset</code> bestaat op de server, of ga terug naar de <a href="index.html">startpagina</a>.`);
+}
+
+function showError(msg){
+  document.getElementById('loading').innerHTML=`
+    <div style="font-size:48px;margin-bottom:16px">😕</div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:12px">Set niet gevonden</div>
+    <p style="color:var(--text2);max-width:400px;line-height:1.6">${msg}</p>
+    <a href="index.html" class="btn btn-primary" style="margin-top:24px;text-decoration:none">← Terug naar home</a>
+  `;
+}
+
+function toSlug(str){
+  return str.toLowerCase()
+    .replace(/[àáâäãåā]/g,'a').replace(/[èéêëē]/g,'e').replace(/[ìíîïī]/g,'i')
+    .replace(/[òóôöõøō]/g,'o').replace(/[ùúûüū]/g,'u').replace(/[ñ]/g,'n')
+    .replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-').slice(0,60)||'set';
+}
+
+/* ══════════════════════════════════════════
+   VIEWS
+══════════════════════════════════════════ */
+function renderSetView(){
+  document.title=`${SET.title} — StudyDeck`;
+  document.getElementById('nav-set-title').textContent=SET.title;
+  const el=document.getElementById('main-screen');
+  el.style.animation='none';el.offsetHeight;
+  el.style.animation='pageIn .4s var(--ease2) both';
+  el.innerHTML=`
+    <button class="back-btn" onclick="window.location.href='index.html'">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Alle sets
+    </button>
+    <div style="margin-bottom:28px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div class="set-detail-title">${esc(SET.title)}</div>
+          ${SET.description?`<p style="color:var(--text2);margin-bottom:10px">${esc(SET.description)}</p>`:''}
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="badge badge-purple">${SET.terms.length} begrippen</span>
+            ${SET.vak?`<span class="badge badge-orange">${esc(SET.vak)}</span>`:''}
+            ${SET.datum?`<span class="badge badge-gray">${SET.datum}</span>`:''}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card" onclick="startMode('flashcards')">
+        <div class="mode-card-icon">⚡</div>
+        <div class="mode-card-title">Flitskaarten</div>
+        <div class="mode-card-desc">Kaart omdraaien &amp; doorlopen</div>
+      </div>
+      <div class="mode-card" onclick="startMode('stampen')">
+        <div class="mode-card-icon">🧠</div>
+        <div class="mode-card-title">Stampen</div>
+        <div class="mode-card-desc">Zelf antwoord intikken</div>
+      </div>
+      <div class="mode-card" onclick="startMode('overhoren')">
+        <div class="mode-card-icon">📝</div>
+        <div class="mode-card-title">Overhoren</div>
+        <div class="mode-card-desc">Oefentoets — resultaat achteraf</div>
+      </div>
+    </div>
+    <div class="section-hdr"><h3>Alle begrippen</h3><span style="font-size:13px;color:var(--text2)">${SET.terms.length}</span></div>
+    <div class="terms-list">
+      ${SET.terms.map((t,i)=>`
+        <div class="term-item" style="animation:cardLeft ${.12+i*.04}s var(--ease2) both">
+          <div><div class="term-label">Begrip</div><div style="font-weight:800;font-size:15px">${esc(t.term)}</div></div>
+          <div class="term-divider"></div>
+          <div><div class="term-label">Definitie</div><div style="color:var(--text2);font-size:14px">${esc(t.def)}</div></div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  currentMode='home';
+}
+
+function startMode(mode){
+  currentMode=mode;
+  const el=document.getElementById('main-screen');
+  el.style.animation='none';el.offsetHeight;
+  el.style.animation='iosOpen .45s cubic-bezier(0.34,1.3,0.64,1) both';
+  if(mode==='flashcards')renderFlashcards();
+  else if(mode==='stampen')renderStampen();
+  else if(mode==='overhoren')renderOverhoren();
+}
+
+function backToSet(){
+  const el=document.getElementById('main-screen');
+  el.style.animation='none';el.offsetHeight;
+  el.style.animation='pageIn .4s var(--ease2) both';
+  renderSetView();
+}
+
+/* ══════════════════════════════════════════
+   SHARED HELPERS
+══════════════════════════════════════════ */
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function escA(s){return esc(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;');}
+function checkAns(inp,correct,typo=true){
+  const n=s=>s.toLowerCase().trim().replace(/[.,;:!?]/g,'').replace(/\s+/g,' ');
+  const a=n(inp),b=n(correct);
+  if(a===b)return true;
+  if(!typo)return false;
+  if(Math.abs(a.length-b.length)>3)return false;
+  return lev(a,b)<=Math.max(1,Math.floor(b.length*.14));
+}
+function lev(a,b){
+  const m=a.length,n=b.length;
+  const d=Array.from({length:m+1},(_,i)=>Array.from({length:n+1},(_,j)=>i===0?j:j===0?i:0));
+  for(let i=1;i<=m;i++)for(let j=1;j<=n;j++)d[i][j]=a[i-1]===b[j-1]?d[i-1][j-1]:1+Math.min(d[i-1][j],d[i][j-1],d[i-1][j-1]);
+  return d[m][n];
+}
+
+function streakCircleHTML(id,streak){
+  const f=streak>=3;
+  return`<div class="streak-circle${f?' on-fire':''}" id="${id}">
+    <span class="streak-num">${streak||0}</span>
+    <svg class="flame-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path class="f2" d="M12 2C12 2 8 7 8 11c0 1.5.5 2.8 1.3 3.8C8.5 13.8 8 12.5 8 11c0-1.8.8-3.5 1.6-5C9.2 8.5 9 11 9 11c0 3.3 2.2 6 3 6.5C13.8 17 16 14.3 16 11c0-2-.7-3.8-1.5-5 .8 1.2 1.5 2.8 1.5 5 0 1.5-.5 2.8-1.3 3.8.8-1 1.3-2.3 1.3-3.8C16 7 12 2 12 2z" fill="#f97316" opacity="0.7"/>
+      <path class="f1" d="M12 4C12 4 9.5 8 9.5 11c0 1.38.56 2.63 1.46 3.54C10.35 13.62 10 12.36 10 11c0-1.68.8-3.29 1.5-4.5C11.18 8.32 11 10 11 11c0 2.76 1.34 5 2 5.5C14.66 16 16 13.76 16 11c0-1.96-.82-3.68-1.5-4.5C15.2 7.71 16 9.32 16 11c0 1.36-.35 2.62-.96 3.54A5 5 0 0 0 14.5 11C14.5 8 12 4 12 4z" fill="#fb923c"/>
+      <path d="M12 8c0 0-1.5 2-1.5 3.5S11.2 14 12 14.5c.8-.5 1.5-1.5 1.5-3S12 8 12 8z" fill="#fde68a"/>
+    </svg>
+  </div>`;
+}
+function updateStreakCircle(id,streak){
+  const el=document.getElementById(id);if(!el)return;
+  const f=streak>=3;
+  el.className='streak-circle'+(f?' on-fire':'');
+  const n=el.querySelector('.streak-num');if(n)n.textContent=streak||0;
+}
+
+/* ══════════════════════════════════════════
+   FLASHCARDS
+══════════════════════════════════════════ */
+let FC={};
+function renderFlashcards(){
+  if(!FC._active||FC._setId!==SET.id){
+    FC={terms:shuffle([...SET.terms]),idx:0,flipped:false,front:'term',shuffleOn:true,loop:false,known:new Set(),streak:0,_active:true,_setId:SET.id,_origOrder:[...SET.terms],_finished:false};
+  }
+  const el=document.getElementById('main-screen');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backToSet()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Terug
+    </button>
+    <div class="fc-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px">
+        <div><div style="font-size:20px;font-weight:800">⚡ Flitskaarten</div><div style="font-size:13px;color:var(--text2)">${esc(SET.title)}</div></div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-icon" onclick="fcUndoShuffle()" title="Maak sorteren ongedaan">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+          <div class="settings-dropdown-wrap">
+            <button class="btn-icon" onclick="toggleDD('fc-dd')">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+            </button>
+            <div id="fc-dd" class="settings-dropdown" style="display:none">
+              <div class="settings-section">
+                <div class="settings-section-title">Voorzijde</div>
+                <div class="settings-row"><span class="settings-row-label">Toon eerst</span>
+                  <select class="settings-select" onchange="FC.front=this.value;fcUpdate()">
+                    <option value="term" ${FC.front==='term'?'selected':''}>Begrip</option>
+                    <option value="def" ${FC.front==='def'?'selected':''}>Definitie</option>
+                  </select>
+                </div>
+              </div>
+              <div class="settings-section">
+                <div class="settings-section-title">Opties</div>
+                <div class="settings-row"><span class="settings-row-label">Schudden</span><label class="toggle"><input type="checkbox" ${FC.shuffleOn?'checked':''} onchange="FC.shuffleOn=this.checked;fcApplyShuffle()"><span class="toggle-slider"></span></label></div>
+                <div class="settings-row"><span class="settings-row-label">Herhalen</span><label class="toggle"><input type="checkbox" ${FC.loop?'checked':''} onchange="FC.loop=this.checked"><span class="toggle-slider"></span></label></div>
+              </div>
+              <div style="margin-top:10px"><button class="btn btn-glass btn-sm" style="width:100%" onclick="fcHardReset();closeDD('fc-dd')">↺ Opnieuw beginnen</button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="fc-prog" style="width:0%"></div></div>
+        ${streakCircleHTML('fc-streak',FC.streak||0)}
+      </div>
+      <div style="text-align:center;font-size:13px;color:var(--text3);margin-bottom:14px" id="fc-ctr"></div>
+      <div class="fc-card-scene" id="fc-scene" onclick="fcFlip()">
+        <div class="fc-card-inner" id="fc-inner">
+          <div class="fc-face"><div class="fc-face-label" id="fc-fl"></div><div class="fc-face-text" id="fc-ft"></div></div>
+          <div class="fc-face fc-face-back"><div class="fc-face-label" id="fc-bl"></div><div class="fc-face-text" id="fc-bt"></div></div>
+        </div>
+      </div>
+      <div style="font-size:13px;color:var(--text3);text-align:center;margin-bottom:16px">Klik om te draaien · ← Wist ik niet &nbsp;·&nbsp; Wist ik → · spatie om te draaien</div>
+      <div style="display:flex;gap:16px;justify-content:center">
+        <button class="btn btn-red" onclick="fcMark(false)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Wist ik niet
+        </button>
+        <button class="btn btn-green" onclick="fcMark(true)">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
+          Wist ik!
+        </button>
+      </div>
+      <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text2);font-weight:600" id="fc-known-stat"></div>
+      <div class="results-overlay" id="fc-results"></div>
+    </div>
+  `;
+  fcUpdate();
+  if(FC._finished)showFCResults();
+}
+
+function fcUpdate(){
+  const t=FC.terms[FC.idx];if(!t)return;
+  const fi=FC.front==='term';
+  document.getElementById('fc-fl').textContent=fi?'Begrip':'Definitie';
+  document.getElementById('fc-ft').textContent=fi?t.term:t.def;
+  document.getElementById('fc-bl').textContent=fi?'Definitie':'Begrip';
+  document.getElementById('fc-bt').textContent=fi?t.def:t.term;
+  document.getElementById('fc-inner').classList.remove('flipped');
+  FC.flipped=false;
+  document.getElementById('fc-prog').style.width=Math.round((FC.idx/FC.terms.length)*100)+'%';
+  document.getElementById('fc-ctr').textContent=`${FC.idx+1} / ${FC.terms.length}`;
+  updateStreakCircle('fc-streak',FC.streak||0);
+  const ks=document.getElementById('fc-known-stat');
+  if(ks)ks.textContent=`✓ ${FC.known.size} van ${FC.terms.length} gekend`;
+}
+function fcFlip(){FC.flipped=!FC.flipped;document.getElementById('fc-inner').classList.toggle('flipped',FC.flipped);}
+function fcMark(known){
+  if(FC._finished)return;
+  if(known){FC.known.add(FC.idx);FC.streak=(FC.streak||0)+1;}
+  else{FC.known.delete(FC.idx);FC.streak=0;}
+  checkStreak(FC.streak);updateStreakCircle('fc-streak',FC.streak||0);
+  if(FC.idx<FC.terms.length-1){
+    const sc=document.getElementById('fc-scene');
+    if(sc){sc.style.animation='none';sc.offsetHeight;sc.style.animation='cardLeft .3s var(--ease2)';}
+    FC.idx++;fcUpdate();
+  }else{FC._finished=true;showFCResults();}
+}
+function showFCResults(){
+  const pct=Math.round((FC.known.size/FC.terms.length)*100);
+  const o=document.getElementById('fc-results');
+  if(!o)return;
+  o.style.display='flex';
+  o.innerHTML=`<div style="font-size:40px;margin-bottom:8px">🎉</div>
+    <div class="results-pct">${pct}%</div>
+    <div style="color:var(--text2);margin-bottom:20px;font-weight:600">${FC.known.size} van ${FC.terms.length} gekend</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="fcHardReset()">↺ Opnieuw</button>
+      <button class="btn btn-glass" onclick="backToSet()">Terug naar set</button>
+    </div>`;
+}
+function fcHardReset(){
+  FC={terms:FC.shuffleOn?shuffle([...SET.terms]):[...SET.terms],idx:0,flipped:false,front:FC.front||'term',shuffleOn:FC.shuffleOn!==undefined?FC.shuffleOn:true,loop:FC.loop||false,known:new Set(),streak:0,_active:true,_setId:SET.id,_origOrder:[...SET.terms],_finished:false};
+  renderFlashcards();
+}
+function fcUndoShuffle(){FC.terms=[...FC._origOrder];FC.idx=0;FC.known.clear();FC.streak=0;FC._finished=false;renderFlashcards();showToast('Volgorde teruggezet');}
+function fcApplyShuffle(){FC.terms=FC.shuffleOn?shuffle([...SET.terms]):[...SET.terms];FC.idx=0;FC.known.clear();FC._finished=false;fcUpdate();}
+
+/* ══════════════════════════════════════════
+   STAMPEN
+══════════════════════════════════════════ */
+let ST={};
+function renderStampen(){
+  if(!ST._active||ST._setId!==SET.id){
+    ST={terms:shuffle([...SET.terms]),correct:0,wrong:0,qmode:'term',itype:'open',shuffleOn:true,typo:true,hints:true,streak:0,knownIds:new Set(),wrongItems:[],_active:true,_setId:SET.id,_cpShown:false,_finished:false,_queue:[],_wrongRetry:[],_retryCountdown:0};
+    stBuildQueue();
+  }
+  const el=document.getElementById('main-screen');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backToSet()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Terug
+    </button>
+    <div class="st-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div><div style="font-size:20px;font-weight:800">🧠 Stampen</div><div style="font-size:13px;color:var(--text2)">${esc(SET.title)}</div></div>
+        <div class="settings-dropdown-wrap">
+          <button class="btn-icon" onclick="toggleDD('st-dd')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </button>
+          <div id="st-dd" class="settings-dropdown" style="display:none">
+            <div class="settings-section">
+              <div class="settings-section-title">Vraagrichting</div>
+              <div class="settings-row"><span class="settings-row-label">Naar</span>
+                <select class="settings-select" onchange="ST.qmode=this.value">
+                  <option value="term" ${ST.qmode==='term'?'selected':''}>Begrip → Def.</option>
+                  <option value="def" ${ST.qmode==='def'?'selected':''}>Def. → Begrip</option>
+                  <option value="mix" ${ST.qmode==='mix'?'selected':''}>Gemengd</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Type invoer</div>
+              <div class="settings-row"><span class="settings-row-label">Modus</span>
+                <select class="settings-select" onchange="ST.itype=this.value;stHardReset()">
+                  <option value="open" ${ST.itype==='open'?'selected':''}>Schriftelijk</option>
+                  <option value="mc" ${ST.itype==='mc'?'selected':''}>Meerkeuze</option>
+                  <option value="mix" ${ST.itype==='mix'?'selected':''}>Gemengd</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Extra</div>
+              <div class="settings-row"><span class="settings-row-label">Schudden</span><label class="toggle"><input type="checkbox" ${ST.shuffleOn?'checked':''} onchange="ST.shuffleOn=this.checked;stHardReset()"><span class="toggle-slider"></span></label></div>
+              <div class="settings-row"><span class="settings-row-label">Typo-tolerantie</span><label class="toggle"><input type="checkbox" ${ST.typo?'checked':''} onchange="ST.typo=this.checked"><span class="toggle-slider"></span></label></div>
+              <div class="settings-row"><span class="settings-row-label">Hint tonen</span><label class="toggle"><input type="checkbox" ${ST.hints?'checked':''} onchange="ST.hints=this.checked"><span class="toggle-slider"></span></label></div>
+            </div>
+            <div style="margin-top:10px"><button class="btn btn-glass btn-sm" style="width:100%" onclick="stHardReset();closeDD('st-dd')">↺ Opnieuw</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="progress-row">
+        <div class="progress-track"><div class="progress-fill" id="st-prog" style="width:0%"></div></div>
+        ${streakCircleHTML('st-streak',ST.streak||0)}
+      </div>
+      <div class="stats-row" style="margin-top:12px">
+        <div class="stat-box"><div class="stat-num stat-blue" id="st-left">${ST._queue.length}</div><div class="stat-label">Resterend</div></div>
+        <div class="stat-box"><div class="stat-num stat-green" id="st-cor">${ST.correct}</div><div class="stat-label">Goed</div></div>
+        <div class="stat-box"><div class="stat-num stat-red" id="st-wr">${ST.wrong}</div><div class="stat-label">Fout</div></div>
+      </div>
+      <div id="st-main"></div>
+      <div class="results-overlay" id="st-results"></div>
+    </div>
+  `;
+  if(ST._finished)stShowResultsOverlay();else stRenderQ();
+}
+
+function stBuildQueue(){ST._queue=ST.shuffleOn?shuffle([...SET.terms]):[...SET.terms];ST._wrongRetry=[];ST._retryCountdown=0;}
+function stGetCurrent(){
+  if(ST._wrongRetry.length>0&&ST._retryCountdown<=0){const t=ST._wrongRetry.shift();ST._retryCountdown=3;return{t,isRetry:true};}
+  if(ST._retryCountdown>0)ST._retryCountdown--;
+  if(!ST._queue.length)return null;
+  return{t:ST._queue[0],isRetry:false};
+}
+function stGetPair(t){
+  let d=ST.qmode==='mix'?(Math.random()>.5?'term':'def'):ST.qmode;
+  ST._dir=d;
+  return{q:d==='term'?t.term:t.def,a:d==='term'?t.def:t.term};
+}
+function stRenderQ(){
+  const el=document.getElementById('st-main');if(!el)return;
+  const done=ST.correct+ST.wrong;
+  if(done>0&&done%7===0&&!ST._cpShown){ST._cpShown=true;showCheckpoint();return;}
+  ST._cpShown=false;
+  const cur=stGetCurrent();
+  if(!cur){ST._finished=true;stShowResultsOverlay();return;}
+  const{t,isRetry}=cur;
+  const{q,a}=stGetPair(t);
+  ST._currentQ=q;ST._currentA=a;ST._currentT=t;ST._isRetry=isRetry;ST.answered=false;
+  const useType=ST.itype==='mix'?(Math.random()>.5?'open':'mc'):ST.itype;
+  ST._useType=useType;
+  const hint=a.length>0?a[0]+'_'.repeat(Math.max(0,a.length-1)):' ';
+  const qlabel=ST._dir==='term'?'Definitie van:':'Begrip voor:';
+  let body='';
+  if(useType==='mc'){
+    const opts=shuffle([a,...shuffle(SET.terms.filter(x=>x!==t)).slice(0,3).map(x=>ST._dir==='term'?x.def:x.term)]);
+    body=`<div class="mc-options" id="st-mc-opts">${opts.map((o,i)=>`<button class="mc-option" id="st-opt-${i}" onclick="stPickMC(${i},'${escA(o)}','${escA(a)}')">${'ABCD'[i]}. ${esc(o)}</button>`).join('')}</div>
+    <div id="st-fb" style="display:none;margin-top:8px"></div>
+    <div id="st-next-area" style="display:none;text-align:center;margin-top:10px"><button class="btn btn-glass btn-sm" onclick="stNext()">Volgende →</button></div>`;
+  } else {
+    body=`<div style="margin-bottom:12px"><input type="text" id="st-inp" placeholder="Jouw antwoord..." onkeydown="if(event.key==='Enter')stCheckOpen()" autocomplete="off"></div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary" onclick="stCheckOpen()">Controleer</button>
+      ${ST.hints?`<button class="st-hint-btn" onclick="document.getElementById('st-hint-area').innerHTML='<span style=color:var(--accent);font-weight:700>Hint: ${escA(hint)}</span>'">💡 Hint</button>`:''}
+      <button class="btn btn-glass" onclick="stSkip()">Sla over</button>
+    </div>
+    <div id="st-fb" style="display:none;margin-top:12px"></div>
+    <div id="st-next-area" style="display:none;text-align:center;margin-top:10px"><button class="btn btn-glass btn-sm" onclick="stNext()">Volgende →</button></div>`;
+  }
+  el.innerHTML=`
+    <div class="st-qbox" style="animation:cardLeft .3s var(--ease2)">
+      <div class="st-qlabel">${qlabel}${isRetry?' <span style="font-size:10px;background:rgba(232,58,74,0.15);color:var(--red);padding:2px 8px;border-radius:20px;margin-left:6px">Herhaling</span>':''}</div>
+      <div class="st-qtext">${esc(q)}</div>
+      <div id="st-hint-area" style="margin:8px 0;font-size:14px"></div>
+    </div>${body}`;
+  if(useType==='open')setTimeout(()=>document.getElementById('st-inp')?.focus(),60);
+}
+
+function stPickMC(idx,chosen,answer){
+  if(ST.answered)return;
+  const ok=chosen===answer;
+  document.querySelectorAll('#st-mc-opts .mc-option').forEach((b,i)=>{b.classList.remove('sel-correct','sel-wrong');});
+  document.getElementById('st-opt-'+idx).classList.add(ok?'sel-correct':'sel-wrong');
+  if(!ok){
+    document.querySelectorAll('#st-mc-opts .mc-option').forEach((b,i)=>{if(i!==idx)b.onclick=()=>stPickMC(i,b.textContent.slice(3).trim(),answer);});
+    ST.answered=false;
+    const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML='✗ Nog niet goed — kies opnieuw of klik Volgende';}
+    const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+  } else {
+    ST.answered=true;
+    document.querySelectorAll('#st-mc-opts .mc-option').forEach(b=>b.style.pointerEvents='none');
+    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();
+    checkStreak(ST.streak);stUpdateStats();
+    const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
+    const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+    setTimeout(()=>stRenderQ(),1200);
+  }
+}
+function stCheckOpen(){
+  const inp=document.getElementById('st-inp');if(!inp||ST.answered)return;
+  const val=inp.value.trim();
+  if(!val){inp.classList.add('shake-anim');setTimeout(()=>inp.classList.remove('shake-anim'),400);return;}
+  ST.answered=true;inp.disabled=true;
+  const ok=checkAns(val,ST._currentA,ST.typo);
+  if(ok){ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();checkStreak(ST.streak);stUpdateStats();
+    const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
+    const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+    setTimeout(()=>stRenderQ(),1200);
+  } else {
+    ST.wrong++;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:val,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
+    const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`✗ Fout. Juist: <strong>${esc(ST._currentA)}</strong><br><button class="fb-override-btn" onclick="stOverride()">✓ Ik had het toch goed</button>`;}
+    const na=document.getElementById('st-next-area');if(na)na.style.display='block';
+  }
+}
+function stOverride(){ST.wrong=Math.max(0,ST.wrong-1);ST.correct++;ST.streak++;ST._wrongRetry=ST._wrongRetry.filter(x=>x!==ST._currentT);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);const fb=document.getElementById('st-fb');if(fb){fb.className='st-feedback fb-correct';fb.innerHTML='✓ Als goed gerekend!';}stUpdateStats();}
+function stSkip(){ST.wrong++;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:'(overgeslagen)',t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();stRenderQ();}
+function stNext(){
+  const wrongEl=document.querySelector('#st-mc-opts .mc-option.sel-wrong:not(.sel-correct)');
+  if(wrongEl&&!document.querySelector('#st-mc-opts .mc-option.sel-correct')){
+    const given=wrongEl.textContent.slice(3).trim();
+    ST.wrong++;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();stRenderQ();return;
+  }
+  stRenderQ();
+}
+function stUpdateStats(){
+  document.getElementById('st-left').textContent=ST._queue.length+ST._wrongRetry.length;
+  document.getElementById('st-cor').textContent=ST.correct;
+  document.getElementById('st-wr').textContent=ST.wrong;
+  const done=ST.correct+ST.wrong;
+  const prog=document.getElementById('st-prog');if(prog)prog.style.width=Math.round((done/(done+ST._queue.length+ST._wrongRetry.length+.001))*100)+'%';
+  updateStreakCircle('st-streak',ST.streak||0);
+}
+function stShowResultsOverlay(){
+  const pct=Math.round((ST.correct/(ST.correct+ST.wrong||1))*100);
+  const o=document.getElementById('st-results');if(!o)return;
+  o.style.display='flex';
+  o.innerHTML=`<div style="font-size:40px;margin-bottom:8px">🎉</div>
+    <div class="results-pct">${pct}%</div>
+    <div style="color:var(--text2);font-weight:600;font-size:17px;margin-bottom:24px">${ST.correct} goed, ${ST.wrong} fout</div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn btn-primary btn-lg" onclick="stHardReset()">↺ Opnieuw</button>
+      <button class="btn btn-glass btn-lg" onclick="backToSet()">Terug</button>
+    </div>
+    ${ST.wrongItems.length?`<div style="text-align:left;width:100%;max-width:500px;margin-top:24px">
+      <div style="font-size:16px;font-weight:800;margin-bottom:12px">Foute antwoorden (${ST.wrongItems.length})</div>
+      ${ST.wrongItems.map(w=>`<div class="wrong-item"><div style="font-size:12px;color:var(--text3);font-weight:600;margin-bottom:3px">Vraag: ${esc(w.q)}</div><div style="color:var(--red);font-size:14px;font-weight:700">✗ ${esc(w.given)}</div><div style="color:var(--green);font-size:14px;font-weight:700">✓ ${esc(w.a)}</div></div>`).join('')}
+    </div>`:''}`;
+}
+function stHardReset(){const s={...ST};ST={...s,correct:0,wrong:0,streak:0,wrongItems:[],knownIds:new Set(),_cpShown:false,_finished:false,_queue:[],_wrongRetry:[],_retryCountdown:0};stBuildQueue();renderStampen();}
+
+function showCheckpoint(){
+  const done=ST.correct+ST.wrong;
+  const pct=Math.round((done/(done+ST._queue.length+.001))*100);
+  document.getElementById('checkpoint-layer').innerHTML=`
+    <div class="checkpoint-overlay">
+      <div class="checkpoint-panel">
+        <div style="font-size:24px;font-weight:800;margin-bottom:4px">🔥 Voortgang: ${pct}%</div>
+        <div style="color:var(--text2);font-size:15px;margin-bottom:16px">${done} vragen beantwoord</div>
+        <div class="progress-track" style="margin-bottom:20px"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:${ST.wrongItems.length?'16px':'0'}">
+          <div class="stat-box"><div class="stat-num stat-green">${ST.correct}</div><div class="stat-label">Goed</div></div>
+          <div class="stat-box"><div class="stat-num stat-red">${ST.wrong}</div><div class="stat-label">Fout</div></div>
+        </div>
+        ${ST.wrongItems.length?`<div style="margin:12px 0 8px;font-size:13px;font-weight:700;color:var(--red)">✗ Nog te leren (${ST.wrongItems.length})</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">${ST.wrongItems.map(w=>`<div class="cp-term unknown">✗ ${esc(w.t.term)}</div>`).join('')}</div>`:''}
+        <button class="btn btn-primary btn-lg" style="width:100%;margin-top:8px" onclick="document.getElementById('checkpoint-layer').innerHTML='';stRenderQ()">Doorgaan →</button>
+      </div>
+    </div>`;
+}
+
+/* ══════════════════════════════════════════
+   OVERHOREN
+══════════════════════════════════════════ */
+let OH={};
+function renderOverhoren(){
+  if(!OH._active||OH._setId!==SET.id){
+    OH={terms:shuffle([...SET.terms]),qmode:'term',itype:'mc',shuffleOn:true,typo:true,answers:{},numOpts:4,_active:true,_setId:SET.id};
+  }
+  const el=document.getElementById('main-screen');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backToSet()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Terug
+    </button>
+    <div class="st-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+        <div><div style="font-size:20px;font-weight:800">📝 Overhoren</div><div style="font-size:13px;color:var(--text2)">${esc(SET.title)}</div></div>
+        <div class="settings-dropdown-wrap">
+          <button class="btn-icon" onclick="toggleDD('oh-dd')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </button>
+          <div id="oh-dd" class="settings-dropdown" style="display:none">
+            <div class="settings-section">
+              <div class="settings-section-title">Type vragen</div>
+              <div class="settings-row"><span class="settings-row-label">Modus</span>
+                <select class="settings-select" onchange="OH.itype=this.value;ohRestart()">
+                  <option value="mc" ${OH.itype==='mc'?'selected':''}>Meerkeuze</option>
+                  <option value="open" ${OH.itype==='open'?'selected':''}>Schriftelijk</option>
+                  <option value="mix" ${OH.itype==='mix'?'selected':''}>Gemengd</option>
+                </select>
+              </div>
+              <div class="settings-row"><span class="settings-row-label">Richting</span>
+                <select class="settings-select" onchange="OH.qmode=this.value;ohRestart()">
+                  <option value="term" ${OH.qmode==='term'?'selected':''}>Begrip → Def.</option>
+                  <option value="def" ${OH.qmode==='def'?'selected':''}>Def. → Begrip</option>
+                  <option value="mix" ${OH.qmode==='mix'?'selected':''}>Gemengd</option>
+                </select>
+              </div>
+              <div class="settings-row"><span class="settings-row-label">MC-opties</span>
+                <select class="settings-select" onchange="OH.numOpts=+this.value;ohRestart()">
+                  <option value="4" ${OH.numOpts===4?'selected':''}>4</option>
+                  <option value="3" ${OH.numOpts===3?'selected':''}>3</option>
+                  <option value="6" ${OH.numOpts===6?'selected':''}>6</option>
+                </select>
+              </div>
+            </div>
+            <div class="settings-section">
+              <div class="settings-section-title">Extra</div>
+              <div class="settings-row"><span class="settings-row-label">Schudden</span><label class="toggle"><input type="checkbox" ${OH.shuffleOn?'checked':''} onchange="OH.shuffleOn=this.checked;ohRestart()"><span class="toggle-slider"></span></label></div>
+              <div class="settings-row"><span class="settings-row-label">Typo-tolerantie</span><label class="toggle"><input type="checkbox" ${OH.typo?'checked':''} onchange="OH.typo=this.checked"><span class="toggle-slider"></span></label></div>
+            </div>
+            <div style="margin-top:10px"><button class="btn btn-glass btn-sm" style="width:100%" onclick="ohRestart();closeDD('oh-dd')">↺ Nieuwe toets</button></div>
+          </div>
+        </div>
+      </div>
+      <div class="exam-info">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        Resultaten pas na inleveren. Je kunt je antwoord altijd nog wijzigen.
+      </div>
+      <div class="progress-row" style="margin-bottom:12px">
+        <div class="progress-track"><div class="progress-fill" id="oh-prog" style="width:0%"></div></div>
+        <span style="font-size:13px;color:var(--text2)" id="oh-ctr">0 / ${OH.terms.length} beantwoord</span>
+      </div>
+      <div id="oh-questions"></div>
+      <button class="btn btn-primary btn-lg" style="width:100%;margin-top:20px;display:none" id="oh-submit" onclick="ohSubmit()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+        Toets inleveren
+      </button>
+    </div>
+  `;
+  ohBuild();
+}
+
+function ohBuild(){
+  OH.questions=(OH.shuffleOn?shuffle([...OH.terms]):[...OH.terms]).map((t,i)=>{
+    let d=OH.qmode==='mix'?(Math.random()>.5?'term':'def'):OH.qmode;
+    const q=d==='term'?t.term:t.def,a=d==='term'?t.def:t.term;
+    let type=OH.itype==='mix'?(Math.random()>.5?'mc':'open'):OH.itype;
+    let opts=null;
+    if(type==='mc'){const others=shuffle(SET.terms.filter(x=>x!==t)).slice(0,OH.numOpts-1).map(x=>d==='term'?x.def:x.term);opts=shuffle([a,...others]);}
+    return{i,t,q,a,type,opts};
+  });
+  OH.answers={};
+  document.getElementById('oh-questions').innerHTML=OH.questions.map((qq,i)=>`
+    <div class="glass-sm" style="background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:20px;margin-bottom:12px;animation:slideUp ${.1+i*.05}s var(--ease2) both" id="oh-q-${i}">
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
+        <span style="background:var(--accent-light);color:#4255ff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">${i+1}</span>
+        <div style="font-size:15px;font-weight:700">${esc(qq.q)}</div>
+      </div>
+      ${qq.type==='mc'?`<div class="mc-options" id="oh-opts-${i}">${qq.opts.map((o,j)=>`<button class="mc-option" id="oh-opt-${i}-${j}" onclick="ohPickMC(${i},${j},'${escA(o)}','${escA(qq.a)}')">${'ABCDEF'[j]}. ${esc(o)}</button>`).join('')}</div>`
+      :`<input type="text" id="oh-open-${i}" placeholder="Jouw antwoord..." oninput="ohOpenInput(${i},this.value)" autocomplete="off">`}
+    </div>`).join('');
+}
+
+function ohPickMC(qi,oi,chosen,answer){
+  document.querySelectorAll(`#oh-opts-${qi} .mc-option`).forEach((b,j)=>{b.style.background='';b.style.borderColor='';b.style.fontWeight='600';});
+  const btn=document.getElementById(`oh-opt-${qi}-${oi}`);
+  btn.style.background='rgba(66,85,255,0.12)';btn.style.borderColor='#4255ff';btn.style.fontWeight='800';
+  OH.answers[qi]={type:'mc',chosen,answer,correct:chosen===answer};
+  ohCheckAll();
+}
+function ohOpenInput(qi,val){OH.answers[qi]={type:'open',chosen:val,answer:OH.questions[qi].a};ohCheckAll();}
+function ohCheckAll(){
+  const total=OH.questions.length,done=Object.keys(OH.answers).length;
+  const prog=document.getElementById('oh-prog');if(prog)prog.style.width=Math.round((done/total)*100)+'%';
+  const ctr=document.getElementById('oh-ctr');if(ctr)ctr.textContent=`${done} / ${total} beantwoord`;
+  const sb=document.getElementById('oh-submit');if(sb)sb.style.display=done>=total?'':'none';
+}
+function ohSubmit(){
+  let correct=0;
+  OH.questions.forEach((qq,i)=>{
+    const ans=OH.answers[i]||{correct:false,chosen:'—',answer:qq.a,type:qq.type};
+    if(ans.type==='open')ans.correct=checkAns(ans.chosen,qq.a,OH.typo);
+    OH.answers[i]=ans;
+    if(ans.correct)correct++;
+  });
+  const tot=OH.questions.length,pct=Math.round((correct/tot)*100);
+  const el=document.querySelector('#main-screen .st-wrap');
+  el.innerHTML=`
+    <button class="back-btn" onclick="backToSet()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+      Terug
+    </button>
+    <div style="display:flex;flex-direction:column;align-items:center;padding:32px 0;text-align:center">
+      <div style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,#4255ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${pct}%</div>
+      <div style="color:var(--text2);font-size:18px;font-weight:600;margin-bottom:24px">${correct} van ${tot} goed</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+        <button class="btn btn-primary btn-lg" onclick="ohRestart()">↺ Nieuwe toets</button>
+        <button class="btn btn-glass btn-lg" onclick="backToSet()">Terug</button>
+      </div>
+    </div>
+    <div class="section-hdr" style="margin-top:24px"><h3>Alle vragen</h3></div>
+    ${OH.questions.map((qq,i)=>{
+      const ans=OH.answers[i]||{correct:false,chosen:'—'};
+      return`<div class="exam-review-item ${ans.correct?'exam-review-correct':'exam-review-wrong'}" style="animation:slideUp ${.08+i*.04}s var(--ease2) both">
+        <div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:6px">
+          <span style="background:${ans.correct?'rgba(24,182,114,0.15)':'rgba(232,58,74,0.12)'};color:${ans.correct?'var(--green)':'var(--red)'};border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0">${i+1}</span>
+          <div style="font-size:14px;font-weight:700">${esc(qq.q)}</div>
+        </div>
+        ${!ans.correct?`<div style="font-size:13px;color:var(--red);font-weight:700">✗ Jij: ${esc(ans.chosen)}</div>`:''}
+        <div style="font-size:13px;color:var(--green);font-weight:700">✓ ${esc(qq.a)}</div>
+      </div>`;
+    }).join('')}`;
+  OH._active=false;
+}
+function ohRestart(){OH._active=false;renderOverhoren();}
+
+/* ══════════════════════════════════════════
+   STREAK / MILESTONE
+══════════════════════════════════════════ */
+const ENCOURAGE=['🔥 Op rolletjes!','💪 Geweldig!','⚡ Scherp!','🎯 Raak!','✨ Fantastisch!','🚀 Bijna perfect!'];
+function checkStreak(n){
+  if(n>0&&n%5===0)showMilestone(n);
+  else if(n===3)showEncourage('🔥 Op rolletjes!');
+  else if(n>0&&n%2===0)showEncourage(ENCOURAGE[Math.floor(Math.random()*ENCOURAGE.length)]);
+}
+function showEncourage(msg){const e=document.createElement('div');e.className='encourage';e.textContent=msg;document.body.appendChild(e);setTimeout(()=>e.remove(),1000);}
+function showMilestone(n){
+  const msgs={5:'5 op rij!',10:'10 op rij!',15:'15 op rij!',20:'Onstopbaar!',25:'Legendarisch!'};
+  document.getElementById('milestone-panel').innerHTML=`
+    <div style="font-size:54px;margin-bottom:10px;animation:pulseFlame 1s ease-in-out infinite">🔥</div>
+    <div class="milestone-num">${n}</div>
+    <div class="milestone-text">${msgs[n]||n+' op rij!'}</div>
+    <div style="color:var(--text2);font-size:16px;margin-top:4px">Geweldige streak!</div>
+    <button class="btn btn-primary" style="margin-top:20px" onclick="document.getElementById('milestone-overlay').classList.remove('active')">Doorgaan</button>`;
+  document.getElementById('milestone-overlay').classList.add('active');
+}
+
+/* ══════════════════════════════════════════
+   DROPDOWN
+══════════════════════════════════════════ */
+let openDD=null;
+function toggleDD(id){
+  const el=document.getElementById(id);if(!el)return;
+  if(openDD&&openDD!==id)closeDD(openDD);
+  if(el.style.display==='none'||!el.style.display){el.style.display='block';openDD=id;}
+  else closeDD(id);
+}
+function closeDD(id){const el=document.getElementById(id);if(el)el.style.display='none';if(openDD===id)openDD=null;}
+document.addEventListener('click',e=>{if(openDD&&!e.target.closest('.settings-dropdown-wrap'))closeDD(openDD);});
+
+/* ══════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════ */
+function showModal(html){const mb=document.getElementById('modal-bg');document.getElementById('modal-panel').innerHTML=html;mb.style.display='flex';}
+function closeModal(){document.getElementById('modal-bg').style.display='none';}
+
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+let _tt;
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(_tt);_tt=setTimeout(()=>t.classList.remove('show'),2500);}
+
+/* ══════════════════════════════════════════
+   KEYBOARD
+══════════════════════════════════════════ */
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();document.getElementById('milestone-overlay').classList.remove('active');if(openDD)closeDD(openDD);}
+  if(currentMode==='flashcards'){
+    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return;
+    if(e.key==='ArrowLeft'){e.preventDefault();fcMark(false);}
+    else if(e.key==='ArrowRight'){e.preventDefault();fcMark(true);}
+    else if(e.key===' '){e.preventDefault();fcFlip();}
+  }
+});
+
+/* ══════════════════════════════════════════
+   BOOT
+══════════════════════════════════════════ */
+boot();
+</script>
+</body>
+</html>
