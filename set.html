@@ -466,7 +466,7 @@ function stPickMC(idx,chosen,answer){
   document.querySelectorAll('#st-mc-opts .mc-option').forEach(b=>{b.classList.remove('sel-correct','sel-wrong');b.style.pointerEvents='none';});
   document.getElementById('st-opt-'+idx).classList.add(ok?'sel-correct':'sel-wrong');
   if(ok){
-    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();checkStreak(ST.streak);stUpdateStats();
+    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();else{ST.wrong=Math.max(0,ST.wrong-1);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);}checkStreak(ST.streak);stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1000);
@@ -486,7 +486,7 @@ function stCheckOpen(){
   ST.answered=true;inp.disabled=true;
   const ok=checkAns(val,ST._currentA,ST.typoLevel);
   if(ok){
-    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();checkStreak(ST.streak);stUpdateStats();
+    ST.correct++;ST.streak++;if(!ST._isRetry)ST._queue.shift();else{ST.wrong=Math.max(0,ST.wrong-1);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);}checkStreak(ST.streak);stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-correct';fb.innerHTML='✓ Correct! 🎉';}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1200);
