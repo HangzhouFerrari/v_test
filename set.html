@@ -280,26 +280,32 @@ async function boot(){
   const slug=params.get('set');
   if(!slug){showError('Geen set opgegeven. Ga terug naar de <a href="index.html">startpagina</a>.');return;}
 
-  // 1. Try to fetch .vset file
+  // 1. Try to fetch .vset file from server
   try{
     const resp=await fetch(`sets/${encodeURIComponent(slug)}.vset`);
     if(resp.ok){
       const raw=await resp.text();
       try{SET=decodeVset(raw);}
-      catch{SET=JSON.parse(raw);} // plain JSON fallback
+      catch{SET=JSON.parse(raw);}
       renderSetView();
       return;
     }
   }catch(e){}
 
-  // 2. Fall back to localStorage
-  try{
-    const stored=JSON.parse(localStorage.getItem('sd_sets')||'[]');
-    const found=stored.find(s=>s.slug===slug||s.id===slug||toSlug(s.title)===slug);
-    if(found){SET=found;renderSetView();return;}
-  }catch(e){}
+  // 2. Try localStorage - direct and flexible matching
+  const stored=JSON.parse(localStorage.getItem('sd_sets')||'[]');
+  for(let s of stored){
+    const slugMatches=s.slug && s.slug.toLowerCase()===slug.toLowerCase();
+    const idMatches=s.id && s.id===slug;
+    const titleMatches=s.title && toSlug(s.title).toLowerCase()===slug.toLowerCase();
+    if(slugMatches || idMatches || titleMatches){
+      SET=s;
+      renderSetView();
+      return;
+    }
+  }
 
-  showError(`Set "<strong>${esc(slug)}</strong>" niet gevonden.<br>Zorg dat <code>sets/${esc(slug)}.vset</code> bestaat op de server, of ga terug naar de <a href="index.html">startpagina</a>.`);
+  showError(`Set "<strong>${esc(slug)}</strong>" niet gevonden.<br>Controleer of de set in localStorage is opgeslagen.<br><br><em style="font-size:12px;color:var(--text3)">Debug: ${stored.length} sets beschikbaar</em>`);
 }
 
 function showError(msg){
@@ -366,9 +372,9 @@ function renderSetView(){
     <div class="terms-list">
       ${SET.terms.map((t,i)=>`
         <div class="term-item" style="animation:cardLeft ${.12+i*.04}s var(--ease2) both">
-          <div><div class="term-label">Begrip</div><div style="font-weight:800;font-size:15px">${esc(t.term)}</div></div>
+          <div><div class="term-label">Begrip</div><div style="font-weight:800;font-size:15px">${renderTerm(t,'term')}</div>${renderImages(t)}</div>
           <div class="term-divider"></div>
-          <div><div class="term-label">Definitie</div><div style="color:var(--text2);font-size:14px">${esc(t.def)}</div></div>
+          <div><div class="term-label">Definitie</div><div style="color:var(--text2);font-size:14px">${renderTerm(t,'def')}</div></div>
         </div>
       `).join('')}
     </div>
@@ -399,6 +405,27 @@ function backToSet(){
 function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 function escA(s){return esc(s).replace(/'/g,'&#39;').replace(/"/g,'&quot;');}
+// Helper to render formatted term/definition
+function renderTerm(t,type='term'){
+  const segments=type==='term'?t.termSegments:t.defSegments;
+  const text=type==='term'?t.term:t.def;
+
+  if(segments&&segments.length){
+    return segments.map(s=>{
+      if(!s.text)return'';
+      const style=`${s.color?`color:${s.color};`:''}${s.bold?'font-weight:700;':''}${s.italic?'font-style:italic;':''}`;
+      return style?`<span style="${style}">${esc(s.text)}</span>`:esc(s.text);
+    }).join('');
+  }
+  return esc(text);
+}
+
+function renderImages(t){
+  if(!t.images||!t.images.length)return'';
+  return `<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${t.images.map(img=>`
+    <img src="data:image/png;base64,${img.base64}" style="max-width:120px;max-height:120px;border-radius:6px;object-fit:cover">
+  `).join('')}</div>`;
+}
 function checkAns(inp,correct,typo=true){
   const n=s=>s.toLowerCase().trim().replace(/[.,;:!?]/g,'').replace(/\s+/g,' ');
   const a=n(inp),b=n(correct);
@@ -511,9 +538,9 @@ function fcUpdate(){
   const t=FC.terms[FC.idx];if(!t)return;
   const fi=FC.front==='term';
   document.getElementById('fc-fl').textContent=fi?'Begrip':'Definitie';
-  document.getElementById('fc-ft').textContent=fi?t.term:t.def;
+  document.getElementById('fc-ft').innerHTML=fi?renderTerm(t,'term')+renderImages(t):renderTerm(t,'def');
   document.getElementById('fc-bl').textContent=fi?'Definitie':'Begrip';
-  document.getElementById('fc-bt').textContent=fi?t.def:t.term;
+  document.getElementById('fc-bt').innerHTML=fi?renderTerm(t,'def'):renderTerm(t,'term')+renderImages(t);
   document.getElementById('fc-inner').classList.remove('flipped');
   FC.flipped=false;
   document.getElementById('fc-prog').style.width=Math.round((FC.idx/FC.terms.length)*100)+'%';
@@ -668,7 +695,7 @@ function stRenderQ(){
   el.innerHTML=`
     <div class="st-qbox" style="animation:cardLeft .3s var(--ease2)">
       <div class="st-qlabel">${qlabel}${isRetry?' <span style="font-size:10px;background:rgba(232,58,74,0.15);color:var(--red);padding:2px 8px;border-radius:20px;margin-left:6px">Herhaling</span>':''}</div>
-      <div class="st-qtext">${esc(q)}</div>
+      <div class="st-qtext">${ST._dir==='term'?renderTerm(ST._currentT,'term')+renderImages(ST._currentT):renderTerm(ST._currentT,'def')}</div>
       <div id="st-hint-area" style="margin:8px 0;font-size:14px"></div>
     </div>${body}`;
   if(useType==='open')setTimeout(()=>document.getElementById('st-inp')?.focus(),60);
@@ -846,14 +873,14 @@ function ohBuild(){
     let type=OH.itype==='mix'?(Math.random()>.5?'mc':'open'):OH.itype;
     let opts=null;
     if(type==='mc'){const others=shuffle(SET.terms.filter(x=>x!==t)).slice(0,OH.numOpts-1).map(x=>d==='term'?x.def:x.term);opts=shuffle([a,...others]);}
-    return{i,t,q,a,type,opts};
+    return{i,t,q,a,type,opts,dir:d};
   });
   OH.answers={};
   document.getElementById('oh-questions').innerHTML=OH.questions.map((qq,i)=>`
     <div class="glass-sm" style="background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:20px;margin-bottom:12px;animation:slideUp ${.1+i*.05}s var(--ease2) both" id="oh-q-${i}">
       <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
         <span style="background:var(--accent-light);color:#4255ff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">${i+1}</span>
-        <div style="font-size:15px;font-weight:700">${esc(qq.q)}</div>
+        <div style="font-size:15px;font-weight:700">${qq.dir==='term'?renderTerm(qq.t,'term')+renderImages(qq.t):renderTerm(qq.t,'def')}</div>
       </div>
       ${qq.type==='mc'?`<div class="mc-options" id="oh-opts-${i}">${qq.opts.map((o,j)=>`<button class="mc-option" id="oh-opt-${i}-${j}" onclick="ohPickMC(${i},${j},'${escA(o)}','${escA(qq.a)}')">${'ABCDEF'[j]}. ${esc(o)}</button>`).join('')}</div>`
       :`<input type="text" id="oh-open-${i}" placeholder="Jouw antwoord..." oninput="ohOpenInput(${i},this.value)" autocomplete="off">`}

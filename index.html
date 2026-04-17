@@ -84,14 +84,37 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
 /* Modal */
 .modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(160,150,200,0.4);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;}
 .modal-panel{background:rgba(252,250,255,0.99);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:28px;width:90%;max-width:560px;max-height:90vh;overflow-y:auto;box-shadow:0 16px 64px rgba(80,60,160,0.2);animation:slideUp .35s var(--ease2);}
-.modal-panel h3{font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px}
+.modal-panel h3{font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.3px;display:flex;align-items:center;justify-content:space-between}
+.modal-header-actions{display:flex;gap:4px}
+.modal-header-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;background:rgba(66,85,255,0.08);border:none;cursor:pointer;border-radius:8px;color:var(--text2);transition:all .15s;font-size:16px}
+.modal-header-btn:hover{background:rgba(66,85,255,0.15);color:var(--accent)}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid rgba(180,170,210,0.2)}
+/* Maximized modal */
+.modal-bg.modal-maximized{background:rgba(160,150,200,0.5)}
+.modal-bg.modal-maximized .modal-panel{width:95%;max-width:none;max-height:96vh;border-radius:var(--r)}
 
 /* Pair rows */
-.pair-row{display:grid;grid-template-columns:30px 1fr 1fr 28px;gap:8px;align-items:center;margin-bottom:8px}
-.pair-num{width:28px;height:28px;border-radius:50%;background:rgba(66,85,255,0.1);color:#4255ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
-.pair-del{width:26px;height:26px;border-radius:50%;background:none;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s}
+.pair-row{display:grid;grid-template-columns:30px 1fr 1fr 28px;gap:8px;align-items:start;margin-bottom:12px;padding:8px;background:rgba(255,255,255,0.4);border-radius:6px}
+.pair-num{width:28px;height:28px;border-radius:50%;background:rgba(66,85,255,0.1);color:#4255ff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0;margin-top:2px}
+.pair-del{width:26px;height:26px;border-radius:50%;background:none;border:none;color:var(--text3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;transition:all .15s;margin-top:2px}
 .pair-del:hover{color:var(--red);background:rgba(232,58,74,0.1)}
+/* Formatting toolbar */
+.format-toolbar{display:none;background:rgba(66,85,255,0.05);border:1px solid rgba(66,85,255,0.15);border-radius:var(--r4);padding:8px;margin-top:4px;flex-wrap:wrap;align-items:center;gap:4px}
+.format-toolbar.show{display:flex}
+.format-btn{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.6);border:1px solid rgba(180,170,210,0.3);cursor:pointer;border-radius:6px;font-size:13px;font-weight:700;transition:all .15s}
+.format-btn:hover{background:rgba(255,255,255,0.9);border-color:rgba(66,85,255,0.5)}
+.format-btn.active{background:#4255ff;color:#fff;border-color:#4255ff}
+.color-palette{display:flex;gap:4px}
+.color-swatch{width:24px;height:24px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:all .15s}
+.color-swatch:hover{transform:scale(1.1);border-color:rgba(0,0,0,0.2)}
+.color-swatch.active{border-color:#000;box-shadow:0 0 0 2px #fff,0 0 0 4px #4255ff}
+
+/* Image upload */
+.image-gallery{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.image-thumb{width:60px;height:60px;border-radius:6px;object-fit:cover;border:2px solid rgba(200,195,230,0.4);cursor:pointer;transition:all .15s}
+.image-thumb:hover{border-color:#4255ff;transform:scale(1.05)}
+.image-upload-btn{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;background:rgba(66,85,255,0.1);border:1px dashed rgba(66,85,255,0.4);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;color:#4255ff;transition:all .15s}
+.image-upload-btn:hover{background:rgba(66,85,255,0.2);border-color:#4255ff}
 
 /* Toast */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,0.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
@@ -321,14 +344,41 @@ function toSlug(str){
 
 
 /* ══ CREATE MODAL ══ */
-let CE={id:null,pairs:[]};
+let CE={id:null,pairs:[],isMaximized:false};
+
+function toggleMaximizeModal(){
+  CE.isMaximized=!CE.isMaximized;
+  const bg=document.getElementById('modal-bg');
+  if(CE.isMaximized){
+    bg.classList.add('modal-maximized');
+  }else{
+    bg.classList.remove('modal-maximized');
+  }
+}
 
 function showCreateModal(id){
   CE.id=id||null;
   const s=id?DB.sets.find(x=>x.id===id):null;
-  CE.pairs=s?s.terms.map(t=>({...t})):[{term:'',def:''},{term:'',def:''}];
+  CE.pairs=s?s.terms.map(t=>{
+    const term={...t};
+    // Migrate old term-level formatting to segments if needed
+    if(!term.termSegments&&(term.termColor||term.termBold||term.termItalic)){
+      term.termSegments=[{text:term.term,color:term.termColor,bold:term.termBold,italic:term.termItalic}];
+    }
+    if(!term.defSegments&&(term.defColor||term.defBold||term.defItalic)){
+      term.defSegments=[{text:term.def,color:term.defColor,bold:term.defBold,italic:term.defItalic}];
+    }
+    return term;
+  }):[{term:'',def:''},{term:'',def:''}];
   showModal(`
-    <h3>${id?'Set bewerken':'Nieuwe set'}</h3>
+    <h3>
+      <span>${id?'Set bewerken':'Nieuwe set'}</span>
+      <div class="modal-header-actions">
+        <button class="modal-header-btn" onclick="toggleMaximizeModal()" title="${CE.isMaximized?'Minimaliseer':'Maximaliseer'}">
+          ${CE.isMaximized?'⊞':'↗'}
+        </button>
+      </div>
+    </h3>
     <div class="two-col" style="margin-bottom:12px">
       <div class="input-group"><label>Titel *</label><input id="c-title" type="text" placeholder="Bijv. Biologie H3" value="${esc(s?.title||'')}"></div>
       <div class="input-group"><label>Vak</label><input id="c-vak" type="text" placeholder="Bijv. Wiskunde" value="${esc(s?.vak||'')}"></div>
@@ -361,26 +411,210 @@ function showCreateModal(id){
 }
 function showEditModal(id){showCreateModal(id);}
 
+/* ══ FORMATTING HELPERS ══ */
+const PRESET_COLORS=['#FF4444','#4499FF','#44CC44','#FFA500','#9944FF','#FF1493'];
+
+function renderSegments(segments,plain=false){
+  if(!segments||!segments.length)return'';
+  if(plain)return segments.map(s=>s.text).join('');
+  return segments.map(s=>{
+    if(!s.text)return'';
+    const style=`${s.color?`color:${s.color};`:''}${s.bold?'font-weight:700;':''}${s.italic?'font-style:italic;':''}`;
+    return style?`<span style="${style}">${esc(s.text)}</span>`:esc(s.text);
+  }).join('');
+}
+
+function applyFormatting(text,start,end,prop,value){
+  if(!text)return[];
+  let segments=[{text:text}];
+  if(start<0||end>text.length||start>=end)return segments;
+
+  let pos=0,result=[];
+  for(const seg of segments){
+    const segEnd=pos+seg.text.length;
+    if(segEnd<=start||pos>=end){
+      result.push(seg);pos=segEnd;continue;
+    }
+    const inStart=Math.max(0,start-pos);
+    const inEnd=Math.min(seg.text.length,end-pos);
+    if(inStart>0)result.push({text:seg.text.slice(0,inStart),...seg});
+    const midSeg={text:seg.text.slice(inStart,inEnd),...seg};
+    midSeg[prop]=value;
+    result.push(midSeg);
+    if(inEnd<seg.text.length)result.push({text:seg.text.slice(inEnd),...seg});
+    pos=segEnd;
+  }
+  return result;
+}
+
+function ceUploadImage(idx,type){
+  const inp=document.createElement('input');
+  inp.type='file';inp.accept='image/*';
+  inp.onchange=e=>{
+    const file=e.target.files[0];
+    if(!file){showToast('Geen bestand geselecteerd');return;}
+    if(file.size>500000){showToast('Afbeelding te groot (max 500KB)');return;}
+    const reader=new FileReader();
+    reader.onload=evt=>{
+      const b64=evt.target.result.split(',')[1];
+      const pair=CE.pairs[idx];
+      if(!pair.images)pair.images=[];
+      pair.images.push({id:'img_'+Date.now(),base64:b64});
+      if(pair.images.length>3){showToast('Max 3 afbeeldingen per begrip');pair.images.pop();return;}
+      ceRenderPairs();
+      showToast('Afbeelding toegevoegd!');
+    };
+    reader.readAsDataURL(file);
+  };
+  inp.click();
+}
+
+function ceRemoveImage(idx,imgIdx){
+  const pair=CE.pairs[idx];
+  if(pair.images){
+    pair.images.splice(imgIdx,1);
+    ceRenderPairs();
+    showToast('Afbeelding verwijderd');
+  }
+}
+
 function ceRenderPairs(){
   const el=document.getElementById('ce-pairs');
   if(!el)return;
+  const activeInputId=document.activeElement?.id; // Remember which input had focus
   el.innerHTML=CE.pairs.map((p,i)=>`
-    <div class="pair-row">
+    <div class="pair-row" style="flex-wrap:wrap">
       <div class="pair-num">${i+1}</div>
-      <input type="text" placeholder="Begrip" value="${esc(p.term)}" oninput="CE.pairs[${i}].term=this.value">
-      <input type="text" placeholder="Definitie" value="${esc(p.def)}" oninput="CE.pairs[${i}].def=this.value">
+      <div style="display:flex;flex-direction:column;gap:4px;grid-column:2">
+        <input type="text" id="ce-term-${i}" placeholder="Begrip" value="${esc(p.term)}"
+          oninput="ceHandleInput(${i},'term',this.value)"
+          onfocus="document.getElementById('fmt-term-${i}').classList.add('show')"
+          onblur="document.getElementById('fmt-term-${i}').classList.remove('show')"
+          style="min-width:100%">
+        <div class="format-toolbar" id="fmt-term-${i}" style="gap:4px">
+          <div class="color-palette">${PRESET_COLORS.map(c=>`
+            <div class="color-swatch ${p.activeTermColor===c?'active':''}" style="background:${c}" onclick="ceToggleColor(${i},'term','${c}');document.getElementById('ce-term-${i}').focus()" title="Kleur"></div>
+          `).join('')}</div>
+          <button class="format-btn ${p.activeTermBold?'active':''}" onclick="ceToggleBold(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Vet">B</button>
+          <button class="format-btn ${p.activeTermItalic?'active':''}" onclick="ceToggleItalic(${i},'term');document.getElementById('ce-term-${i}').focus()" title="Cursief">I</button>
+          <button class="image-upload-btn" style="margin-left:auto" onclick="ceUploadImage(${i},'term')">🖼️ Afb.</button>
+        </div>
+        ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;grid-column:3">
+        <input type="text" id="ce-def-${i}" placeholder="Definitie" value="${esc(p.def)}"
+          oninput="ceHandleInput(${i},'def',this.value)"
+          onfocus="document.getElementById('fmt-def-${i}').classList.add('show')"
+          onblur="document.getElementById('fmt-def-${i}').classList.remove('show')"
+          style="min-width:100%">
+        <div class="format-toolbar" id="fmt-def-${i}" style="gap:4px">
+          <div class="color-palette">${PRESET_COLORS.map(c=>`
+            <div class="color-swatch ${p.activeDefColor===c?'active':''}" style="background:${c}" onclick="ceToggleColor(${i},'def','${c}');document.getElementById('ce-def-${i}').focus()" title="Kleur"></div>
+          `).join('')}</div>
+          <button class="format-btn ${p.activeDefBold?'active':''}" onclick="ceToggleBold(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Vet">B</button>
+          <button class="format-btn ${p.activeDefItalic?'active':''}" onclick="ceToggleItalic(${i},'def');document.getElementById('ce-def-${i}').focus()" title="Cursief">I</button>
+          <button class="image-upload-btn" style="margin-left:auto" onclick="ceUploadImage(${i},'def')">🖼️ Afb.</button>
+        </div>
+        ${p.images&&p.images.length?`<div class="image-gallery">${p.images.map((img,j)=>`<img src="data:image/png;base64,${img.base64}" class="image-thumb" onclick="ceRemoveImage(${i},${j})" title="Klik om te verwijderen">`).join('')}</div>`:''}
+      </div>
       <button class="pair-del" onclick="ceRemove(${i})">×</button>
     </div>
   `).join('');
+  // Restore focus to the same input if it still exists
+  if(activeInputId) setTimeout(()=>{const el=document.getElementById(activeInputId); if(el) el.focus();},0);
 }
-function ceAdd(){CE.pairs.push({term:'',def:''});ceRenderPairs();setTimeout(()=>{const rows=document.querySelectorAll('#ce-pairs .pair-row');rows[rows.length-1]?.querySelector('input')?.focus();},50);}
+
+function ceHandleInput(idx,type,newText){
+  const pair=CE.pairs[idx];
+  const oldText=type==='term'?pair.term:pair.def;
+
+  // Update text
+  if(type==='term')pair.term=newText;
+  else pair.def=newText;
+
+  // Find what was added (simple approach: track last char)
+  if(newText.length>oldText.length){
+    const addedText=newText.slice(oldText.length);
+    const activeColor=type==='term'?pair.activeTermColor:pair.activeDefColor;
+    const activeBold=type==='term'?pair.activeTermBold:pair.activeDefBold;
+    const activeItalic=type==='term'?pair.activeTermItalic:pair.activeDefItalic;
+
+    if(activeColor||activeBold||activeItalic){
+      const segFieldKey=type==='term'?'termSegments':'defSegments';
+      let segments=pair[segFieldKey]||[{text:oldText}];
+
+      // Add new segment with formatting
+      segments.push({
+        text: addedText,
+        color: activeColor,
+        bold: activeBold,
+        italic: activeItalic
+      });
+      pair[segFieldKey]=segments;
+    } else {
+      // Clear segments if no active formatting
+      if(type==='term')delete pair.termSegments;
+      else delete pair.defSegments;
+    }
+  }
+}
+
+function ceToggleColor(idx,type,color){
+  const pair=CE.pairs[idx];
+  const activeKey=type==='term'?'activeTermColor':'activeDefColor';
+  if(pair[activeKey]===color){
+    pair[activeKey]=null;
+  } else {
+    pair[activeKey]=color;
+  }
+  ceRenderPairs();
+  showToast(pair[activeKey]?'Kleur ingeschakeld':'Kleur uitgeschakeld');
+}
+
+function ceToggleBold(idx,type){
+  const pair=CE.pairs[idx];
+  const activeKey=type==='term'?'activeTermBold':'activeDefBold';
+  pair[activeKey]=!pair[activeKey];
+  ceRenderPairs();
+  showToast(pair[activeKey]?'Vet ingeschakeld':'Vet uitgeschakeld');
+}
+
+function ceToggleItalic(idx,type){
+  const pair=CE.pairs[idx];
+  const activeKey=type==='term'?'activeTermItalic':'activeDefItalic';
+  pair[activeKey]=!pair[activeKey];
+  ceRenderPairs();
+  showToast(pair[activeKey]?'Cursief ingeschakeld':'Cursief uitgeschakeld');
+}
+function ceAdd(){
+  CE.pairs.push({
+    term:'',def:'',
+    activeTermColor:null,activeTermBold:false,activeTermItalic:false,
+    activeDefColor:null,activeDefBold:false,activeDefItalic:false
+  });
+  ceRenderPairs();
+  setTimeout(()=>{const rows=document.querySelectorAll('#ce-pairs .pair-row');rows[rows.length-1]?.querySelector('input')?.focus();},50);
+}
 function ceRemove(i){if(CE.pairs.length<=1){showToast('Minimaal 1 begrip vereist');return;}CE.pairs.splice(i,1);ceRenderPairs();}
 
 function ceSave(){
   const title=document.getElementById('c-title').value.trim();
   if(!title){showToast('Vul een titel in');return;}
-  const terms=CE.pairs.filter(p=>p.term.trim()||p.def.trim()).map(p=>({term:p.term.trim(),def:p.def.trim()}));
-  if(!terms.length){showToast('Voeg minimaal 1 begrip toe');return;}
+
+  const terms=CE.pairs.filter(p=>p.term.trim()||p.def.trim()).map(p=>{
+    const t={term:p.term.trim(),def:p.def.trim()};
+    // Preserve formatting segments if they exist
+    if(p.termSegments)t.termSegments=p.termSegments;
+    if(p.defSegments)t.defSegments=p.defSegments;
+    if(p.images)t.images=p.images;
+    return t;
+  });
+
+  if(!terms.length){
+    showToast('⚠️ Voeg minimaal 1 begrip toe (links EN rechts invullen)');
+    return;
+  }
+
   const existing=CE.id?DB.sets.find(x=>x.id===CE.id):null;
   const slug=existing?.slug||toSlug(title);
   const set={
@@ -391,10 +625,18 @@ function ceSave(){
     datum:document.getElementById('c-datum').value,
     terms
   };
-  if(CE.id){const idx=DB.sets.findIndex(x=>x.id===CE.id);if(idx>-1)DB.sets[idx]=set;}
-  else DB.sets.unshift(set);
-  saveDB();closeModal();renderHome();
-  showToast(CE.id?'Set opgeslagen!':'Set aangemaakt!');
+
+  if(CE.id){
+    const idx=DB.sets.findIndex(x=>x.id===CE.id);
+    if(idx>-1)DB.sets[idx]=set;
+  }else{
+    DB.sets.unshift(set);
+  }
+
+  saveDB();
+  closeModal();
+  renderHome();
+  showToast(CE.id?'✓ Set opgeslagen!':'✓ Set aangemaakt! ('+ set.id +')');
 }
 
 /* ══ IMPORT MODAL ══ */
@@ -419,7 +661,11 @@ function doDelete(id){DB.sets=DB.sets.filter(s=>s.id!==id);saveDB();closeModal()
 
 /* ══ MODAL ══ */
 function showModal(html){document.getElementById('modal-panel').innerHTML=html;document.getElementById('modal-bg').classList.remove('hidden');}
-function closeModal(){document.getElementById('modal-bg').classList.add('hidden');}
+function closeModal(){
+  CE.isMaximized=false;
+  document.getElementById('modal-bg').classList.add('hidden');
+  document.getElementById('modal-bg').classList.remove('modal-maximized');
+}
 document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 
 /* ══ TOAST ══ */
@@ -431,6 +677,15 @@ function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/<
 /* ══ BOOT ══ */
 initDB();
 loadSetsFromDirectory().then(()=>renderHome());
+
+// Debug helper - roep aan met: window.debugDb() in console
+window.debugDb=function(){
+  console.log('=== DEBUG STORAGE ===');
+  console.log('Sets in memory (DB.sets):', DB.sets.length, DB.sets);
+  console.log('Sets in localStorage:', JSON.parse(localStorage.getItem('sd_sets')||'[]').length);
+  console.log('localStorage raw:', localStorage.getItem('sd_sets'));
+  return {memory: DB.sets.length, storage: JSON.parse(localStorage.getItem('sd_sets')||'[]').length};
+};
 </script>
 </body>
 </html>

@@ -167,6 +167,35 @@ textarea#vset-content{min-height:200px;font-family:monospace;font-size:12px}
       </div>
     </div>
 
+    <!-- Geavanceerd Set Import -->
+    <div class="section">
+      <h2>🚀 Geavanceerd Set Import</h2>
+      <div class="input-group">
+        <label>Format: term1//def1^term2//def2^...</label>
+        <textarea id="advanced-import" placeholder='Biologie//Studie van leven^Cel//Kleinste eenheid van leven^Enzym//Eiwit dat reacties catalyseert' style="min-height:100px;font-family:monospace;font-size:12px"></textarea>
+      </div>
+      <div class="input-group">
+        <label>Set titel</label>
+        <input id="advanced-title" type="text" placeholder="Bijv. Biologie H5">
+      </div>
+      <div class="input-group">
+        <label>Vak</label>
+        <input id="advanced-vak" type="text" placeholder="Bijv. Biologie">
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="parseAdvancedFormat()">📥 Parseeren</button>
+        <button class="btn btn-glass" onclick="document.getElementById('advanced-import').value=''">Wissen</button>
+      </div>
+      <div id="advanced-preview" style="display:none;margin-top:16px;background:rgba(66,85,255,0.06);border:1px solid rgba(66,85,255,0.2);border-radius:var(--r);padding:16px">
+        <h3 style="font-size:14px;font-weight:700;color:#4255ff;margin-bottom:12px">Preview</h3>
+        <div id="advanced-terms" style="max-height:300px;overflow-y:auto"></div>
+        <div class="actions" style="margin-top:16px">
+          <button class="btn btn-primary" onclick="loadAdvancedToCurrentSet()">➕ Aan huidige set toevoegen</button>
+          <button class="btn btn-glass" onclick="createSetFromAdvanced()">📋 Nieuwe set maken</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Base64 to JSON Decoder -->
     <div class="section">
       <h2>🔍 Base64 → JSON Decoder</h2>
@@ -541,6 +570,107 @@ function generateDemoSet(){
   document.getElementById('vset-content').value='(Demo Set - nog niet opgeslagen)';
   renderDecoded();
   showToast('Demo set geladen!');
+}
+
+/* ══════════════════════════════════════════
+   ADVANCED SET IMPORT
+══════════════════════════════════════════ */
+let PARSED_TERMS=[];
+
+function parseAdvancedFormat(){
+  const input=document.getElementById('advanced-import').value.trim();
+  if(!input){showToast('Vul invoer in');return;}
+
+  PARSED_TERMS=[];
+  const pairs=input.split('^');
+
+  for(const pair of pairs){
+    const parts=pair.split('//');
+    if(parts.length===2){
+      const term=parts[0].trim();
+      const def=parts[1].trim();
+      if(term && def){
+        PARSED_TERMS.push({term,def});
+      }
+    }
+  }
+
+  if(!PARSED_TERMS.length){
+    showToast('Geen geldige begrippen gevonden');
+    return;
+  }
+
+  renderAdvancedPreview();
+  showToast('Geparseeerd: '+PARSED_TERMS.length+' begrippen');
+}
+
+function renderAdvancedPreview(){
+  const preview=document.getElementById('advanced-preview');
+  const terms=document.getElementById('advanced-terms');
+
+  terms.innerHTML=PARSED_TERMS.map((t,i)=>`
+    <div style="padding:8px;border-bottom:1px solid rgba(180,170,210,0.2);font-size:13px">
+      <div style="font-weight:700;color:var(--text)">${esc(t.term)}</div>
+      <div style="color:var(--text2);margin-top:4px;font-size:12px">${esc(t.def)}</div>
+    </div>
+  `).join('');
+
+  preview.style.display='block';
+}
+
+function loadAdvancedToCurrentSet(){
+  if(!CURRENT_SET){
+    showToast('Laad eerst een set of maak een nieuw aan');
+    return;
+  }
+
+  if(!PARSED_TERMS.length){
+    showToast('Parseeer eerst begrippen');
+    return;
+  }
+
+  // Add parsed terms to current set
+  CURRENT_SET.terms=(CURRENT_SET.terms||[]).concat(PARSED_TERMS);
+  renderDecoded();
+
+  showToast('✓ '+PARSED_TERMS.length+' begrippen toegevoegd!');
+  document.getElementById('advanced-import').value='';
+  document.getElementById('advanced-preview').style.display='none';
+  PARSED_TERMS=[];
+
+  // Scroll to terms editor
+  document.getElementById('terms-editor').scrollIntoView({behavior:'smooth'});
+}
+
+function createSetFromAdvanced(){
+  if(!PARSED_TERMS.length){
+    showToast('Parseeer eerst begrippen');
+    return;
+  }
+
+  const title=document.getElementById('advanced-title').value.trim()||'Nieuwe Set';
+  const vak=document.getElementById('advanced-vak').value.trim()||'Onbekend';
+
+  CURRENT_SET={
+    id:'set_'+Date.now(),
+    slug:toSlug(title),
+    title:title,
+    vak:vak,
+    datum:new Date().toISOString().split('T')[0],
+    description:'',
+    terms:PARSED_TERMS
+  };
+
+  document.getElementById('vset-content').value='(Nieuwe set - nog niet opgeslagen)';
+  renderDecoded();
+
+  showToast('✓ Nieuwe set gemaakt!');
+  document.getElementById('advanced-import').value='';
+  document.getElementById('advanced-preview').style.display='none';
+  PARSED_TERMS=[];
+
+  // Scroll to set editor
+  document.querySelector('.container').scrollIntoView({behavior:'smooth'});
 }
 
 /* ══════════════════════════════════════════
