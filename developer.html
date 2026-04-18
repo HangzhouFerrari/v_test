@@ -21,6 +21,70 @@
 html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
 body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed;padding:0;}
 
+/* Dark mode overrides */
+body.dark-mode {
+  --bg-grad: linear-gradient(180deg, rgb(10, 10, 10) 0%, rgb(10, 8, 18) 100%);
+  --glass: rgb(34, 33, 41);
+  --glass-border: rgba(64, 73, 112, 0.557);
+  --text: #ffffff;
+  --text2: #e9e9e9;
+  --text3: rgba(255,255,255,0.65);
+  --glass-shadow: 0 0px 10px rgba(0,5,48,0.8), inset 1px 1px 0 rgba(88,93,120,0.9);
+}
+
+body.dark-mode .login-panel, 
+body.dark-mode .section,
+body.dark-mode .decoded-section,
+body.dark-mode #advanced-preview,
+body.dark-mode #decoded-json-result {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text);
+}
+
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode input::placeholder, 
+body.dark-mode textarea::placeholder {
+  color: rgba(255, 255, 255, 0.35) !important;
+}
+
+body.dark-mode .btn-glass {
+  background: rgba(50, 50, 70, 0.7) !important;
+  color: var(--text) !important;
+  border-color: var(--glass-border) !important;
+}
+
+body.dark-mode .stat-card {
+  background: rgba(0, 98, 255, 0.1) !important;
+  border-color: rgba(0, 98, 255, 0.3) !important;
+}
+
+body.dark-mode .term-row {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode #sets-list {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-color: var(--glass-border) !important;
+}
+
+body.dark-mode .pin-input {
+  background: rgba(20, 20, 30, 0.9) !important;
+  color: var(--accent) !important;
+}
+
+body.dark-mode #json-output {
+  background: rgba(0, 0, 0, 0.3) !important;
+  color: #a78bfa !important;
+}
+
 .container{max-width:1200px;margin:0 auto;padding:28px; width:100%}
 
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
@@ -251,11 +315,22 @@ textarea#vset-content{min-height:200px;font-family:monospace;font-size:12px}
 /* ══════════════════════════════════════════
    PINCODE VERIFICATION (HARDCODED)
 ══════════════════════════════════════════ */
-const HARDCODED_PIN='237890';
+/* De hash van '237890' */
+const PIN_HASH='2496d00467794380c5443e1189c445a4a589e49633c706c9a405362e4999f7d8';
+/* De SHA-256 hash van '237890' */
+const PIN_HASH='8607147043818e6c7102e3b3a6977227e1f4864147361e685f0f353a81765c7c';
 
-function verifyPin(){
+async function verifyPin(){
   const pin=document.getElementById('pin-input').value.trim();
-  if(pin===HARDCODED_PIN){
+  
+  // Genereer hash van de ingevoerde pincode
+  const encoder = new TextEncoder();
+  const data = encoder.encode(pin);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashedInput = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+  if(hashedInput===PIN_HASH){
     document.getElementById('login-screen').style.display='none';
     document.getElementById('main-content').classList.add('active');
     loadSets();
@@ -265,6 +340,21 @@ function verifyPin(){
     document.getElementById('pin-input').value='';
     setTimeout(()=>{document.getElementById('login-error').style.display='none'},3000);
   }
+}
+
+function loadThemeSettings(){
+  try {
+    const saved = JSON.parse(localStorage.getItem('sd_theme') || 'null');
+    if(saved) {
+      if(saved.darkMode) document.body.classList.add('dark-mode');
+      if(saved.accentColor) {
+        document.documentElement.style.setProperty('--accent', saved.accentColor);
+        const hex = saved.accentColor.replace('#','');
+        const r = parseInt(hex.substr(0,2), 16), g = parseInt(hex.substr(2,2), 16), b = parseInt(hex.substr(4,2), 16);
+        document.documentElement.style.setProperty('--accent-light', `rgba(${r},${g},${b},0.12)`);
+      }
+    }
+  } catch(e) {}
 }
 
 function logout(){
@@ -711,6 +801,7 @@ document.addEventListener('keydown',e=>{
 
 /* Auto-focus pin input */
 window.addEventListener('load',()=>{
+  loadThemeSettings();
   document.getElementById('pin-input').focus();
 });
 </script>
