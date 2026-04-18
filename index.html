@@ -698,11 +698,18 @@ textarea{resize:vertical;min-height:72px;line-height:1.5}
           <div class="sets-grid" id="recommended-grid"></div>
         </div>
 
-        <div id="section-newest">
+        <div id="section-newest" style="display:none">
           <div class="section-row">
             <h2>✨ Nieuw toegevoegd</h2>
           </div>
           <div class="sets-grid" id="newest-grid"></div>
+        </div>
+
+        <div id="section-my-sets" style="display:none">
+          <div class="section-row">
+            <h2>📂 Mijn sets</h2>
+          </div>
+          <div class="my-sets-grid" id="my-sets-grid"></div>
         </div>
 
         <div id="filter-bar" class="hidden" style="display:none;gap:8px;flex-wrap:wrap;margin-bottom:14px;align-items:center"></div>
@@ -1015,8 +1022,21 @@ function renderHome(){
   const recommended = DB.sets.filter(s => s.vak).sort(() => Math.random() - 0.5).slice(0, 3);
   if (recommended.length) renderSetGrid('recommended-grid', recommended);
   
-  const newest = [...DB.sets].sort((a, b) => (b.id || '').localeCompare(a.id || '')).slice(0, 3);
-  if (newest.length) renderSetGrid('newest-grid', newest);
+  // Alleen sets van de server tonen bij 'Nieuw toegevoegd'
+  const newest = DB.sets.filter(s => s.fromServer).sort((a, b) => (b.id || '').localeCompare(a.id || '')).slice(0, 3);
+  const newestSect = document.getElementById('section-newest');
+  if (newest.length) {
+    newestSect.style.display = 'block';
+    renderSetGrid('newest-grid', newest);
+  } else { newestSect.style.display = 'none'; }
+
+  // Lokale sets tonen bij 'Mijn sets'
+  const mySets = DB.sets.filter(s => !s.fromServer);
+  const mySect = document.getElementById('section-my-sets');
+  if (mySets.length) {
+    mySect.style.display = 'block';
+    renderSetGrid('my-sets-grid', mySets);
+  } else { mySect.style.display = 'none'; }
 }
 
 function renderSetGrid(elementId, sets) {
