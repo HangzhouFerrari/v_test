@@ -6,6 +6,22 @@
 <title>StudyDeck — Laden…</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Ensure jsPDF is ready before boot
+let jsPDFReady = false;
+let jsPDFCheckInterval = setInterval(function() {
+  if (window.jsPDF && window.jsPDF.jsPDF) {
+    jsPDFReady = true;
+    clearInterval(jsPDFCheckInterval);
+    console.log('jsPDF library loaded');
+  }
+}, 100);
+
+// Set timeout to clear the interval after 10 seconds
+setTimeout(() => {
+  if (jsPDFCheckInterval) clearInterval(jsPDFCheckInterval);
+}, 10000);
+</script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -26,12 +42,26 @@
 }
 html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden}
 body{min-height:100vh;background:var(--bg-grad);background-attachment:fixed}
-nav{position:sticky;top:0;z-index:200;background:rgba(240,238,249,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid rgba(200,195,230,0.5);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:0 2px 8px rgba(0,98,255,0.1),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);}
+
+/* Dark mode overrides */
+body.dark-mode nav,
+body.dark-mode .nav-logo {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+}
+body.dark-mode .mode-card, body.dark-mode .term-item, body.dark-mode .st-qbox, body.dark-mode .stat-box, body.dark-mode .mc-option, body.dark-mode .exam-info, body.dark-mode .checkpoint-panel {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+body.dark-mode .fc-face { background: #222129 !important; border-color: var(--glass-border) !important; color: #fff !important; }
+
+nav{position:sticky;top:0;z-index:200;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--glass-shadow);}
 .nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
-.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px rgba(0,98,255,0.35);}
+.nav-logo-icon{width:36px;height:36px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 2px 10px var(--accent-light);}
 .nav-set-title{font-size:14px;font-weight:700;color:var(--text2);max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
-.btn-primary{background:linear-gradient(180deg,var(--accent) 0%,rgba(0,98,255,0.85) 100%);color:#fff;box-shadow:0 2px 12px rgba(0,98,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.25);}
+.btn-primary{background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);color:#fff;box-shadow:0 2px 12px rgba(0,98,255,0.35),inset 1px 1px 0 rgba(255,255,255,0.25);}
 .btn-primary:hover{filter:brightness(1.15);transform:scale(1.04) translateY(-1px)}
 .btn-glass{background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);color:var(--text);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;}
 .btn-glass:hover{background:rgba(255,255,255,0.95);transform:scale(1.04)}
@@ -45,7 +75,7 @@ nav{position:sticky;top:0;z-index:200;background:rgba(240,238,249,0.85);backdrop
 .btn-icon{width:40px;height:40px;padding:0;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(180deg,rgba(255,255,255,0.9) 0%,rgba(255,255,255,0.75) 100%);box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 8px rgba(80,60,160,0.1);border:none;border-radius:12px;cursor:pointer;}
 .btn-icon:hover{background:rgba(255,255,255,0.95);transform:scale(1.08)}
 input,textarea,select{background:rgba(255,255,255,0.85);border:1px solid rgba(200,195,230,0.6);border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;padding:11px 16px;outline:none;transition:all .2s;width:100%;box-shadow:inset 1px 1px 0 rgba(255,255,255,1),0 2px 6px rgba(80,60,160,0.06);}
-input:focus,textarea:focus,select:focus{border-color:var(--accent);background:rgba(255,255,255,0.98);box-shadow:0 0 0 3px rgba(0,98,255,0.12),inset 1px 1px 0 rgba(255,255,255,1);}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);background:var(--glass);box-shadow:0 0 0 3px var(--accent-light),inset 1px 1px 0 rgba(255,255,255,1);}
 .toggle{position:relative;width:46px;height:26px;cursor:pointer;flex-shrink:0}
 .toggle input{opacity:0;width:0;height:0;position:absolute}
 .toggle-slider{position:absolute;inset:0;background:rgba(180,170,210,0.5);border-radius:13px;transition:.25s;}
@@ -75,7 +105,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--accent);background:rg
 .term-divider{width:1px;min-height:24px;background:rgba(66,85,255,0.2);align-self:stretch}
 .term-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-weight:700}
 .badge{display:inline-flex;align-items:center;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:700}
-.badge-purple{background:rgba(0,98,255,0.12);color:var(--accent)}
+.badge-purple{background:var(--accent-light);color:var(--accent)}
 .badge-orange{background:rgba(240,123,32,0.12);color:var(--orange)}
 .badge-gray{background:rgba(120,110,150,0.12);color:var(--text2)}
 .progress-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
@@ -109,7 +139,7 @@ svg.flame-icon{width:22px;height:22px;display:none}
 .fb-wrong{background:rgba(232,58,74,0.14);color:var(--red);border:1px solid rgba(232,58,74,0.3)}
 .fb-override-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:1px solid rgba(24,182,114,0.4);border-radius:8px;padding:5px 12px;font-family:var(--font);font-size:13px;font-weight:700;color:var(--green);cursor:pointer;margin-top:8px;transition:all .15s;}
 .fb-override-btn:hover{background:var(--green-light)}
-.st-hint-btn{background:none;border:1px dashed rgba(0,98,255,0.3);border-radius:8px;padding:6px 14px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .15s;}
+.st-hint-btn{background:none;border:1px dashed var(--accent-light);border-radius:8px;padding:6px 14px;font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;transition:all .15s;}
 .st-hint-btn:hover{background:var(--accent-light)}
 .stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
 .stat-box{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px;text-align:center;box-shadow:var(--glass-shadow);}
@@ -122,7 +152,7 @@ svg.flame-icon{width:22px;height:22px;display:none}
 .mc-option.sel-correct{background:rgba(24,182,114,0.18)!important;border-color:var(--green)!important;color:var(--green)!important}
 .mc-option.sel-wrong{background:rgba(232,58,74,0.15)!important;border-color:var(--red)!important;color:var(--red)!important}
 .mc-option.reveal{background:rgba(24,182,114,0.1)!important;border-color:rgba(24,182,114,0.5)!important;color:var(--green)!important}
-.mc-letter{width:30px;height:30px;border-radius:50%;background:rgba(0,98,255,0.1);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
+.mc-letter{width:30px;height:30px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;}
 .exam-info{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;box-shadow:var(--glass-shadow);display:flex;align-items:center;gap:10px;font-size:14px;color:var(--text2);font-weight:600;}
 .exam-review-item{border-radius:var(--r);padding:14px;margin-bottom:8px;}
 .exam-review-correct{background:rgba(24,182,114,0.12);border:1px solid rgba(24,182,114,0.25)}
@@ -138,7 +168,7 @@ svg.flame-icon{width:22px;height:22px;display:none}
 #milestone-overlay.active{opacity:1;pointer-events:auto}
 .milestone-panel{background:rgba(255,255,255,0.98);border:1.5px solid rgba(200,195,230,0.8);border-radius:var(--r2);padding:36px 48px;box-shadow:0 20px 80px rgba(80,60,160,0.25);text-align:center;animation:msIn .4s var(--ease2);}
 @keyframes msIn{from{opacity:0;transform:scale(0.7)}to{opacity:1;transform:scale(1)}}
-.milestone-num{font-size:64px;font-weight:800;line-height:1;color:#0062ff;margin-bottom:4px}
+.milestone-num{font-size:64px;font-weight:800;line-height:1;color:var(--accent);margin-bottom:4px}
 .milestone-text{font-size:22px;font-weight:800;color:var(--text);margin-bottom:4px}
 .settings-dropdown-wrap{position:relative}
 .settings-dropdown{position:absolute;top:calc(100% + 8px);right:0;z-index:500;background:rgba(252,251,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r2);padding:16px;box-shadow:0 12px 48px rgba(80,60,160,0.18);width:280px;transform-origin:top right;animation:dropIn .25s var(--ease2) both;}
@@ -150,12 +180,12 @@ svg.flame-icon{width:22px;height:22px;display:none}
 .settings-row-label{font-size:14px;font-weight:600;color:var(--text)}
 .settings-select{background:rgba(255,255,255,0.9);border:1px solid rgba(200,195,225,0.6);border-radius:8px;padding:5px 10px;font-size:13px;font-weight:600;color:var(--text);font-family:var(--font);outline:none;cursor:pointer;width:auto;}
 .results-overlay{position:absolute;inset:0;z-index:10;background:rgba(248,246,255,0.99);border-radius:var(--r2);display:none;flex-direction:column;align-items:center;justify-content:center;padding:36px;text-align:center;animation:slideUp .4s var(--ease2)}
-.results-pct{font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,#0062ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.results-pct{font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,var(--accent),#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .wrong-item{border-radius:var(--r);padding:12px 16px;margin-bottom:6px;background:rgba(232,58,74,0.1);border:1px solid rgba(232,58,74,0.2)}
-.encourage{position:fixed;top:28%;left:50%;transform:translate(-50%,-50%);z-index:8999;pointer-events:none;font-size:22px;font-weight:800;color:#0062ff;text-shadow:0 2px 12px rgba(0,98,255,0.3);animation:encourageAnim .9s var(--ease2) both;}
+.encourage{position:fixed;top:28%;left:50%;transform:translate(-50%,-50%);z-index:8999;pointer-events:none;font-size:22px;font-weight:800;color:var(--accent);text-shadow:0 2px 12px rgba(0,98,255,0.3);animation:encourageAnim .9s var(--ease2) both;}
 @keyframes encourageAnim{0%{opacity:0;transform:translate(-50%,-50%) scale(0.7)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-60%) scale(0.95)}}
 .loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center}
-.loading-spinner{width:48px;height:48px;border:4px solid rgba(0,98,255,0.15);border-top-color:#0062ff;border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
+.loading-spinner{width:48px;height:48px;border:4px solid var(--accent-light);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:20px}
 @keyframes spin{to{transform:rotate(360deg)}}
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,0.99);border:1px solid rgba(200,195,230,0.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,0.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
 #toast.show{opacity:1;transform:translateY(0)}
@@ -217,7 +247,9 @@ function loadThemeSettings(){
     const saved=JSON.parse(localStorage.getItem('sd_theme')||'null');
     if(saved){
       const root=document.documentElement.style;
+      const body=document.body;
       if(saved.darkMode){
+        body.classList.add('dark-mode');
         root.setProperty('--bg-grad','linear-gradient(180deg, rgb(10, 10, 10) 0%, rgb(10, 8, 18) 100%)');
         root.setProperty('--glass','rgb(34, 33, 41)');
         root.setProperty('--glass2','rgba(34,33,41,0.90)');
@@ -239,6 +271,7 @@ function loadThemeSettings(){
     }
   }catch(e){}
 }
+}
 
 /* ── DROPDOWN TOGGLE ── */
 function toggleDD(id){
@@ -255,18 +288,80 @@ document.addEventListener('click',(e)=>{
 
 let SET=null,currentMode='home';
 
+/* ── LOAD SETS FROM /sets/ FOR SET.HTML ── */
+async function loadServerSets(){
+  try{
+    const baseURL=window.location.protocol==='file:'?'./sets/':'./sets/';
+    const indexResp=await fetch(baseURL+'index.json');
+    if(indexResp.ok){
+      const fileList=await indexResp.json();
+      const serverSets={};
+      for(const filename of fileList){
+        try{
+          let filePath=baseURL+filename;
+          if(window.location.protocol==='file:'){
+            filePath=baseURL+encodeURIComponent(filename);
+          }
+          const sr=await fetch(filePath);
+          if(sr.ok){
+            const content=await sr.text();
+            let set=null;
+            try{set=decodeVset(content.trim());}catch{try{set=JSON.parse(content.trim());}catch(e){}}
+            if(set&&set.title){
+              set.slug=set.slug||toSlug(set.title);
+              serverSets[set.slug.toLowerCase()]=set;
+            }
+          }
+        }catch(e){}
+      }
+      return serverSets;
+    }
+  }catch(e){}
+  return {};
+}
+
 async function boot(){
   loadThemeSettings();
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('set');
   if(!slug){showError('Geen set opgegeven. Ga terug naar de <a href="index.html">startpagina</a>.');return;}
+  
+  // Load server sets first
+  const serverSets=await loadServerSets();
+  const slugLower=slug.toLowerCase();
+  
+  // Try to find in server sets first
+  if(serverSets[slugLower]){
+    SET=serverSets[slugLower];
+    renderSetView();
+    return;
+  }
+  
+  // Then try from /sets/ by filename
   try{
-    const resp=await fetch(`sets/${encodeURIComponent(slug)}.vset`);
-    if(resp.ok){const raw=await resp.text();try{SET=decodeVset(raw);}catch{SET=JSON.parse(raw);}renderSetView();return;}
+    const baseURL=window.location.protocol==='file:'?'./sets/':'./sets/';
+    let filePath=baseURL+slug+'.vset';
+    if(window.location.protocol==='file:'){
+      filePath=baseURL+encodeURIComponent(slug+'.vset');
+    }
+    const resp=await fetch(filePath);
+    if(resp.ok){
+      const raw=await resp.text();
+      try{SET=decodeVset(raw);}catch{SET=JSON.parse(raw);}
+      SET.slug=slug;
+      renderSetView();
+      return;
+    }
   }catch(e){}
+  
+  // Fall back to localStorage
   const stored=JSON.parse(localStorage.getItem('sd_sets')||'[]');
   for(let s of stored){
-    if((s.slug&&s.slug.toLowerCase()===slug.toLowerCase())||(s.id&&s.id===slug)||(s.title&&toSlug(s.title)===slug)){SET=s;renderSetView();return;}
+    if((s.slug&&s.slug.toLowerCase()===slugLower)||(s.id&&s.id===slug)||(s.title&&toSlug(s.title)===slugLower)){
+      SET=s;
+      renderSetView();
+      return;
+    }
   }
   showError(`Set "<strong>${esc(slug)}</strong>" niet gevonden.<br><a href="index.html">← Terug naar home</a>`);
 }
@@ -678,7 +773,7 @@ function ohBuild(){
   document.getElementById('oh-questions').innerHTML=OH.questions.map((qq,i)=>`
     <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:20px;margin-bottom:12px;animation:slideUp ${.1+i*.05}s var(--ease2) both" id="oh-q-${i}">
       <div style="display:flex;gap:10px;align-items:flex-start;margin-bottom:14px">
-        <span style="background:var(--accent-light);color:#0062ff;border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">${i+1}</span>
+        <span style="background:var(--accent-light);color:var(--accent);border-radius:50%;width:28px;height:28px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0">${i+1}</span>
         <div style="font-size:15px;font-weight:700">${qq.dir==='term'?renderTerm(qq.t,'term')+renderImages(qq.t):renderTerm(qq.t,'def')}</div>
       </div>
       ${qq.type==='mc'?`<div class="mc-options" id="oh-opts-${i}">${qq.opts.map((o,j)=>`<button class="mc-option" id="oh-opt-${i}-${j}" onclick="ohPickMC(${i},${j},'${escA(o)}','${escA(qq.a)}')">${'ABCDEF'[j]}. ${esc(o)}</button>`).join('')}</div>`
@@ -687,7 +782,12 @@ function ohBuild(){
 }
 function ohPickMC(qi,oi,chosen,answer){
   document.querySelectorAll(`#oh-opts-${qi} .mc-option`).forEach(b=>{b.style.background='';b.style.borderColor='';b.style.fontWeight='600';});
-  const btn=document.getElementById(`oh-opt-${qi}-${oi}`);btn.style.background='rgba(0,98,255,0.12)';btn.style.borderColor='#0062ff';btn.style.fontWeight='800';
+  const btn=document.getElementById(`oh-opt-${qi}-${oi}`);
+  const accentColor=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  const accentLight=getComputedStyle(document.documentElement).getPropertyValue('--accent-light').trim();
+  btn.style.background=accentLight;
+  btn.style.borderColor=accentColor;
+  btn.style.fontWeight='800';
   OH.answers[qi]={type:'mc',chosen,answer,correct:chosen===answer};ohCheckAll();
 }
 function ohOpenInput(qi,val){OH.answers[qi]={type:'open',chosen:val,answer:OH.questions[qi].a};ohCheckAll();}
@@ -790,42 +890,53 @@ function makeCopyOfSet(){
 function printSetPDF(){
   if(!SET||!SET.terms.length){showToast('Geen begrippen om af te drukken');return;}
   try{
-    const{jsPDF}=window;
-    if(!jsPDF){showToast('PDF bibliotheek laadt nog...');return;}
-    const doc=new jsPDF();
-    let yPos=20;
+    let jsPDFClass = null;
+    if(window.jspdf && window.jspdf.jsPDF) jsPDFClass = window.jspdf.jsPDF;
+    else if(window.jsPDF && window.jsPDF.jsPDF) jsPDFClass = window.jsPDF.jsPDF;
+    else if(window.jsPDF) jsPDFClass = window.jsPDF;
+    
+    if(!jsPDFClass){
+      showToast('PDF bibliotheek laadt nog... Probeer over een moment opnieuw');
+      return;
+    }
+    
+    const doc=new jsPDFClass();
+    let yPos=30;
     const pageHeight=doc.internal.pageSize.height;
     const margins={left:20,right:20,top:20,bottom:20};
 
     doc.setFont('Helvetica','bold');
-    doc.setFontSize(14);
-    doc.text(`${SET.title} - Begrippen`,margins.left,yPos);yPos+=10;
+    doc.setFontSize(18);
+    doc.text(`${SET.title}`,margins.left,20);
 
-    doc.setFont('Helvetica','normal');
-    doc.setFontSize(10);
-    const colWidth=(210-margins.left-margins.right)/2-2;
+    const col1X = margins.left;
+    const col2X = 105; // Midden van A4
+    const colWidth = 80;
 
     SET.terms.forEach((term,idx)=>{
-      if(yPos>pageHeight-margins.bottom-10){doc.addPage();yPos=margins.top;}
+      if(yPos > pageHeight - margins.bottom){doc.addPage();yPos=margins.top;}
 
       doc.setFont('Helvetica','bold');
       doc.setFontSize(10);
       const termText=(term.term||'').replace(/[\x00-\x1F]/g,' ');
-      const termLines=doc.splitTextToSize(termText,colWidth-2);
-      doc.text(termLines,margins.left+1,yPos);yPos+=Math.max(8,termLines.length*4)+2;
+      const termLines=doc.splitTextToSize(termText, colWidth);
+      doc.text(termLines, col1X, yPos);
 
       doc.setFont('Helvetica','normal');
-      doc.setFontSize(9);
       const defText=(term.def||'').replace(/[\x00-\x1F]/g,' ');
-      const defLines=doc.splitTextToSize(defText,colWidth-2);
-      doc.text(defLines,margins.left+colWidth+3,yPos-termLines.length*4-2);
-      yPos+=Math.max(8,Math.max(termLines.length,defLines.length)*4)+3;
+      const defLines=doc.splitTextToSize(defText, colWidth);
+      doc.text(defLines, col2X, yPos);
+      
+      yPos += Math.max(termLines.length, defLines.length) * 7 + 5;
     });
 
     const filename=(SET.title||'begrippen').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf';
     doc.save(filename);
     showToast('✓ PDF gedownload!');
-  }catch(e){console.error(e);showToast('Fout bij PDF genereren');}
+  }catch(e){
+    console.error('PDF generation error:',e);
+    showToast('Fout bij PDF genereren: '+e.message);
+  }
 }
 
 boot();
