@@ -719,7 +719,7 @@ function stPickMC(idx,chosen,answer){
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1000);
   } else {
-    ST.wrong++;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:chosen,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
+    ST.wrong++;ST._streakBeforeWrong=ST.streak;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:chosen,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`✗ Fout. Juist: <strong>${esc(answer)}</strong>`;}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
   }
@@ -739,17 +739,17 @@ function stCheckOpen(){
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
     setTimeout(()=>stRenderQ(),1200);
   } else {
-    ST.wrong++;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:val,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
+    ST.wrong++;ST._streakBeforeWrong=ST.streak;ST.streak=0;ST.wrongItems.push({q:ST._currentQ,a:ST._currentA,given:val,t:ST._currentT});ST._wrongRetry.push(ST._currentT);if(!ST._isRetry)ST._queue.shift();stUpdateStats();
     const fb=document.getElementById('st-fb');if(fb){fb.style.display='block';fb.className='st-feedback fb-wrong';fb.innerHTML=`✗ Fout. Juist: <strong>${esc(ST._currentA)}</strong><br><button class="fb-override-btn" onclick="stOverride()">✓ Ik had het toch goed</button>`;}
     const na=document.getElementById('st-next-area');if(na)na.style.display='block';
   }
 }
 
 function stOverride(){
-  ST.wrong=Math.max(0,ST.wrong-1);ST.correct++;ST.streak++;
+  ST.wrong=Math.max(0,ST.wrong-1);ST.correct++;ST.streak=(ST._streakBeforeWrong||0)+1;
   ST._wrongRetry=ST._wrongRetry.filter(x=>x!==ST._currentT);ST.wrongItems=ST.wrongItems.filter(w=>w.t!==ST._currentT);
   const fb=document.getElementById('st-fb');if(fb){fb.className='st-feedback fb-correct';fb.innerHTML='✓ Als goed gerekend!';}
-  stUpdateStats();setTimeout(()=>stRenderQ(),800);
+  checkStreak(ST.streak);stUpdateStats();setTimeout(()=>stRenderQ(),800);
 }
 
 /* FIX 3: stSkip — shows feedback+next instead of calling stRenderQ directly */
@@ -897,8 +897,8 @@ function ohSubmit(){
   const el=document.querySelector('#main-screen .st-wrap');
   el.innerHTML=`
     <button class="back-btn" onclick="backToSet()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>Terug</button>
-    <div style="display:flex;flex-direction:column;align-items:center;padding:32px 0;text-align:center">
-      <div style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,#0062ff,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent">${pct}%</div>
+    <div style="background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);padding:32px;text-align:center;margin-bottom:24px;box-shadow:var(--glass-shadow)">
+      <div style="font-size:72px;font-weight:800;letter-spacing:-2px;line-height:1;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${pct}%</div>
       <div style="color:var(--text2);font-size:18px;font-weight:600;margin-bottom:24px">${correct} van ${tot} goed</div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center"><button class="btn btn-primary btn-lg" onclick="ohRestart()">↺ Nieuwe toets</button><button class="btn btn-glass btn-lg" onclick="backToSet()">Terug</button></div>
     </div>
