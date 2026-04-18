@@ -31,8 +31,81 @@ body.dark-mode::-webkit-scrollbar-track { background: #0a0812; }
 body.dark-mode::-webkit-scrollbar-thumb { background: #2a2835; border-radius: 5px; border: 2px solid #0a0812; }
 
 /* Algemene Dark Mode fixes voor elementen die variabele gebruiken */
-body.dark-mode .modal-panel { background: var(--glass) !important; color: var(--text); }
-body.dark-mode .set-card, body.dark-mode .library-item { background: var(--glass2) !important; border-color: var(--glass-border); }
+body.dark-mode .modal-panel { background: var(--glass) !important; color: var(--text); border-color: var(--glass-border) !important; }
+body.dark-mode .modal-header-btn { background: var(--accent-light) !important; color: var(--accent) !important; }
+body.dark-mode .modal-header-btn:hover { background: rgba(0,98,255,0.25) !important; color: var(--accent) !important; }
+body.dark-mode .settings-dropdown { background: var(--glass) !important; border-color: var(--glass-border) !important; color: var(--text); }
+body.dark-mode .set-card, body.dark-mode .library-item { background: var(--glass2) !important; border-color: var(--glass-border); color: var(--text); }
+body.dark-mode .meta-item { background: var(--glass) !important; border-color: var(--glass-border) !important; color: var(--text); }
+body.dark-mode .vak-card { background: rgba(0,98,255,0.08) !important; border-color: var(--accent) !important; color: var(--text); }
+body.dark-mode #search-dropdown { background: var(--glass) !important; border-color: var(--glass-border) !important; }
+
+/* Input fields dark mode */
+body.dark-mode input[type="text"],
+body.dark-mode input[type="date"],
+body.dark-mode textarea,
+body.dark-mode select {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode input[type="text"]:focus,
+body.dark-mode input[type="date"]:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  background: rgba(60, 60, 80, 0.9) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(0,98,255,0.12), inset 1px 1px 0 rgba(88,93,120,0.5) !important;
+}
+
+body.dark-mode .rich-editor {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .rich-editor:focus {
+  background: rgba(60, 60, 80, 0.9) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(0,98,255,0.12), inset 1px 1px 0 rgba(88,93,120,0.5) !important;
+}
+
+body.dark-mode .fmt-bar {
+  background: rgba(40, 40, 60, 0.95) !important;
+  border-color: var(--glass-border) !important;
+}
+
+body.dark-mode .fmt-btn {
+  background: rgba(60, 60, 80, 0.7) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text2) !important;
+}
+
+body.dark-mode .fmt-btn:hover {
+  background: rgba(70, 70, 90, 0.9) !important;
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+}
+
+body.dark-mode .color-swatch {
+  border-color: rgba(100,100,150,0.3) !important;
+}
+
+body.dark-mode .pair-row {
+  background: rgba(45, 45, 65, 0.6) !important;
+  border-color: var(--glass-border) !important;
+}
+
+body.dark-mode .pair-row:focus-within {
+  background: rgba(55, 55, 75, 0.8) !important;
+  border-color: var(--accent-light) !important;
+}
+
+body.dark-mode .pair-num {
+  background: rgba(0, 98, 255, 0.15) !important;
+  color: var(--accent) !important;
+}
 
 /* Dark mode overrides */
 body.dark-mode nav,
@@ -40,6 +113,11 @@ body.dark-mode .nav-logo,
 body.dark-mode .search-box {
   background: var(--glass) !important;
   border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .search-box::placeholder {
+  color: var(--text3) !important;
 }
 
 body.dark-mode .sidebar {
@@ -49,16 +127,43 @@ body.dark-mode .sidebar {
 
 body.dark-mode .sidebar-btn {
   background: rgba(45, 43, 55, 0.6) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text) !important;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.5) inset, -1px -1px 2px rgba(50,50,80,0.5) inset, 0 2px 8px rgba(0,0,0,0.3) !important;
+}
+
+body.dark-mode .sidebar-btn:hover {
+  background: rgba(55, 53, 65, 0.8) !important;
+  box-shadow: 1px 1px 2px rgba(0,0,0,0.6) inset, -1px -1px 2px rgba(60,60,90,0.6) inset, 0 4px 12px rgba(0,0,0,0.4) !important;
 }
 
 body.dark-mode .btn-glass {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: rgba(50, 50, 70, 0.7) !important;
+  color: var(--text) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: inset 1px 1px 0 rgba(88,93,120,0.5), 0 2px 8px rgba(0,0,0,0.4) !important;
 }
 
 body.dark-mode .btn-glass:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(60, 60, 80, 0.8) !important;
+  box-shadow: inset 1px 1px 0 rgba(100,110,140,0.6), 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+body.dark-mode .btn-icon {
+  background: rgba(50, 50, 70, 0.7) !important;
+  color: var(--text) !important;
+  box-shadow: inset 1px 1px 0 rgba(88,93,120,0.5), 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-mode .btn-icon:hover {
+  background: rgba(60, 60, 80, 0.8) !important;
+  box-shadow: inset 1px 1px 0 rgba(100,110,140,0.6), 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+body.dark-mode #toast {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
 }
 
 nav{

@@ -48,13 +48,93 @@ body.dark-mode nav,
 body.dark-mode .nav-logo {
   background: var(--glass) !important;
   border-color: var(--glass-border) !important;
+  color: var(--text) !important;
 }
+
 body.dark-mode .mode-card, body.dark-mode .term-item, body.dark-mode .st-qbox, body.dark-mode .stat-box, body.dark-mode .mc-option, body.dark-mode .exam-info, body.dark-mode .checkpoint-panel {
   background: var(--glass) !important;
   border-color: var(--glass-border) !important;
   color: var(--text) !important;
 }
-body.dark-mode .fc-face { background: #222129 !important; border-color: var(--glass-border) !important; color: #fff !important; }
+
+body.dark-mode .fc-face { background: rgba(40, 40, 60, 0.95) !important; border-color: var(--glass-border) !important; color: #fff !important; }
+body.dark-mode .fc-face-back { background: rgba(45, 50, 70, 0.95) !important; border-color: var(--glass-border) !important; color: #fff !important; }
+
+body.dark-mode input,
+body.dark-mode textarea,
+body.dark-mode select {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode input:focus,
+body.dark-mode textarea:focus,
+body.dark-mode select:focus {
+  background: rgba(60, 60, 80, 0.9) !important;
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(0,98,255,0.12), inset 1px 1px 0 rgba(88,93,120,0.5) !important;
+}
+
+body.dark-mode .btn-glass {
+  background: rgba(50, 50, 70, 0.7) !important;
+  color: var(--text) !important;
+  border-color: var(--glass-border) !important;
+  box-shadow: inset 1px 1px 0 rgba(88,93,120,0.5), 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-mode .btn-glass:hover {
+  background: rgba(60, 60, 80, 0.8) !important;
+  box-shadow: inset 1px 1px 0 rgba(100,110,140,0.6), 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+body.dark-mode .btn-icon {
+  background: rgba(50, 50, 70, 0.7) !important;
+  color: var(--text) !important;
+  box-shadow: inset 1px 1px 0 rgba(88,93,120,0.5), 0 2px 8px rgba(0,0,0,0.4) !important;
+}
+
+body.dark-mode .btn-icon:hover {
+  background: rgba(60, 60, 80, 0.8) !important;
+  box-shadow: inset 1px 1px 0 rgba(100,110,140,0.6), 0 4px 12px rgba(0,0,0,0.5) !important;
+}
+
+body.dark-mode .settings-dropdown {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .settings-select {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode #modal-panel {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode #modal-panel input,
+body.dark-mode #modal-panel textarea {
+  background: rgba(50, 50, 70, 0.8) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode #toast {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
+
+body.dark-mode .milestone-panel {
+  background: var(--glass) !important;
+  border-color: var(--glass-border) !important;
+  color: var(--text) !important;
+}
 
 nav{position:sticky;top:0;z-index:200;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--glass-border);padding:0 28px;height:64px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--glass-shadow);}
 .nav-logo{font-size:20px;font-weight:800;letter-spacing:-0.5px;display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--text);}
@@ -269,8 +349,7 @@ function loadThemeSettings(){
         root.setProperty('--accent-light',`rgba(${r},${g},${b},0.12)`);
       }
     }
-  }catch(e){}
-}
+  }catch(e){console.error('Theme load error:',e);}
 }
 
 /* ── DROPDOWN TOGGLE ── */
@@ -292,7 +371,12 @@ let SET=null,currentMode='home';
 async function loadServerSets(){
   try{
     const baseURL=window.location.protocol==='file:'?'./sets/':'./sets/';
-    const indexResp=await fetch(baseURL+'index.json');
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),3000);
+
+    const indexResp=await fetch(baseURL+'index.json',{signal:controller.signal});
+    clearTimeout(timeoutId);
+
     if(indexResp.ok){
       const fileList=await indexResp.json();
       const serverSets={};
@@ -325,36 +409,10 @@ async function boot(){
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('set');
   if(!slug){showError('Geen set opgegeven. Ga terug naar de <a href="index.html">startpagina</a>.');return;}
-  
-  // Load server sets first
-  const serverSets=await loadServerSets();
+
   const slugLower=slug.toLowerCase();
-  
-  // Try to find in server sets first
-  if(serverSets[slugLower]){
-    SET=serverSets[slugLower];
-    renderSetView();
-    return;
-  }
-  
-  // Then try from /sets/ by filename
-  try{
-    const baseURL=window.location.protocol==='file:'?'./sets/':'./sets/';
-    let filePath=baseURL+slug+'.vset';
-    if(window.location.protocol==='file:'){
-      filePath=baseURL+encodeURIComponent(slug+'.vset');
-    }
-    const resp=await fetch(filePath);
-    if(resp.ok){
-      const raw=await resp.text();
-      try{SET=decodeVset(raw);}catch{SET=JSON.parse(raw);}
-      SET.slug=slug;
-      renderSetView();
-      return;
-    }
-  }catch(e){}
-  
-  // Fall back to localStorage
+
+  // First: try localStorage (fastest)
   const stored=JSON.parse(localStorage.getItem('sd_sets')||'[]');
   for(let s of stored){
     if((s.slug&&s.slug.toLowerCase()===slugLower)||(s.id&&s.id===slug)||(s.title&&toSlug(s.title)===slugLower)){
@@ -363,6 +421,36 @@ async function boot(){
       return;
     }
   }
+
+  // Second: try /sets/ directory by filename
+  try{
+    const baseURL=window.location.protocol==='file:'?'./sets/':'./sets/';
+    let filePath=baseURL+slug+'.vset';
+    if(window.location.protocol==='file:'){
+      filePath=baseURL+encodeURIComponent(slug+'.vset');
+    }
+    const controller=new AbortController();
+    const timeoutId=setTimeout(()=>controller.abort(),2000);
+    const resp=await fetch(filePath,{signal:controller.signal});
+    clearTimeout(timeoutId);
+
+    if(resp.ok){
+      const raw=await resp.text();
+      try{SET=decodeVset(raw);}catch{SET=JSON.parse(raw);}
+      SET.slug=slug;
+      renderSetView();
+      return;
+    }
+  }catch(e){}
+
+  // Third: try /sets/ index with server sets (slower)
+  const serverSets=await loadServerSets();
+  if(serverSets[slugLower]){
+    SET=serverSets[slugLower];
+    renderSetView();
+    return;
+  }
+
   showError(`Set "<strong>${esc(slug)}</strong>" niet gevonden.<br><a href="index.html">← Terug naar home</a>`);
 }
 function showError(msg){document.getElementById('loading').innerHTML=`<div style="font-size:48px;margin-bottom:16px">😕</div><div style="font-size:20px;font-weight:800;margin-bottom:12px">Set niet gevonden</div><p style="color:var(--text2);max-width:400px;line-height:1.6">${msg}</p><a href="index.html" class="btn btn-primary" style="margin-top:24px;text-decoration:none">← Terug naar home</a>`;}
@@ -889,17 +977,28 @@ function makeCopyOfSet(){
 
 function printSetPDF(){
   if(!SET||!SET.terms.length){showToast('Geen begrippen om af te drukken');return;}
-  try{
-    let jsPDFClass = null;
-    if(window.jspdf && window.jspdf.jsPDF) jsPDFClass = window.jspdf.jsPDF;
-    else if(window.jsPDF && window.jsPDF.jsPDF) jsPDFClass = window.jsPDF.jsPDF;
-    else if(window.jsPDF) jsPDFClass = window.jsPDF;
-    
-    if(!jsPDFClass){
-      showToast('PDF bibliotheek laadt nog... Probeer over een moment opnieuw');
-      return;
+
+  // Wait for jsPDF to be ready
+  let attempts=0;
+  const checkInterval=setInterval(()=>{
+    attempts++;
+    let jsPDFClass=null;
+    if(window.jspdf && window.jspdf.jsPDF) jsPDFClass=window.jspdf.jsPDF;
+    else if(window.jsPDF && window.jsPDF.jsPDF) jsPDFClass=window.jsPDF.jsPDF;
+    else if(window.jsPDF) jsPDFClass=window.jsPDF;
+
+    if(jsPDFClass){
+      clearInterval(checkInterval);
+      generatePDF(jsPDFClass);
+    }else if(attempts>30){
+      clearInterval(checkInterval);
+      showToast('PDF bibliotheek laadt niet. Probeer later opnieuw');
     }
-    
+  },100);
+}
+
+function generatePDF(jsPDFClass){
+  try{
     const doc=new jsPDFClass();
     let yPos=30;
     const pageHeight=doc.internal.pageSize.height;
@@ -909,25 +1008,25 @@ function printSetPDF(){
     doc.setFontSize(18);
     doc.text(`${SET.title}`,margins.left,20);
 
-    const col1X = margins.left;
-    const col2X = 105; // Midden van A4
-    const colWidth = 80;
+    const col1X=margins.left;
+    const col2X=105;
+    const colWidth=80;
 
     SET.terms.forEach((term,idx)=>{
-      if(yPos > pageHeight - margins.bottom){doc.addPage();yPos=margins.top;}
+      if(yPos>pageHeight-margins.bottom){doc.addPage();yPos=margins.top;}
 
       doc.setFont('Helvetica','bold');
       doc.setFontSize(10);
-      const termText=(term.term||'').replace(/[\x00-\x1F]/g,' ');
-      const termLines=doc.splitTextToSize(termText, colWidth);
-      doc.text(termLines, col1X, yPos);
+      const termText=(term.term||'').replace(/[\x00-\x1F]/g,' ').replace(/<[^>]*>/g,'');
+      const termLines=doc.splitTextToSize(termText,colWidth);
+      doc.text(termLines,col1X,yPos);
 
       doc.setFont('Helvetica','normal');
-      const defText=(term.def||'').replace(/[\x00-\x1F]/g,' ');
-      const defLines=doc.splitTextToSize(defText, colWidth);
-      doc.text(defLines, col2X, yPos);
-      
-      yPos += Math.max(termLines.length, defLines.length) * 7 + 5;
+      const defText=(term.def||'').replace(/[\x00-\x1F]/g,' ').replace(/<[^>]*>/g,'');
+      const defLines=doc.splitTextToSize(defText,colWidth);
+      doc.text(defLines,col2X,yPos);
+
+      yPos+=Math.max(termLines.length,defLines.length)*7+5;
     });
 
     const filename=(SET.title||'begrippen').replace(/[^a-zA-Z0-9_-]/g,'_')+'.pdf';
