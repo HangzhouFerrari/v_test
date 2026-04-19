@@ -1817,6 +1817,29 @@ window.debugDb = function(){
   console.log('Sets in memory:', DB.sets.length, DB.sets);
   return DB.sets;
 };
+loadSetsFromDirectory().then(() => {
+  showPage('home');
+  setupSearch();
+  // Check for ?edit= parameter (redirect from set.html "Set bewerken")
+  const urlParams = new URLSearchParams(window.location.search);
+  const editId = urlParams.get('edit');
+  if (editId) {
+    // Remove param from URL without reload
+    const newUrl = window.location.pathname;
+    window.history.replaceState({}, '', newUrl);
+    // Wait a tick for DOM to settle, then open edit modal
+    setTimeout(() => {
+      const setToEdit = DB.sets.find(s => s.id === editId);
+      if (setToEdit && !setToEdit.fromServer && !setToEdit._serverFile) {
+        showCreateModal(editId);
+      } else if (setToEdit) {
+        showToast('Server-sets kunnen niet bewerkt worden');
+      } else {
+        showToast('Set niet gevonden');
+      }
+    }, 200);
+  }
+});
 </script>
 </body>
 </html>
