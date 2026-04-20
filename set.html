@@ -98,6 +98,10 @@ nav{
   height: calc(72px + env(safe-area-inset-top, 0px));
   display:flex;align-items:center;justify-content:space-between;
 }
+
+@media(max-width:750px){
+  nav{padding: env(safe-area-inset-top, 0px) 16px 0;}
+}
 .nav-logo{max-height: 50px; height: 100%;width:auto;display:flex;align-items:center;gap:8px;}
 .nav-logo-svg {height:80%;width:auto;display:block;}
 .btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;white-space:nowrap;}
