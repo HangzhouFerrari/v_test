@@ -316,6 +316,88 @@ svg.flame-icon{width:22px;height:22px;display:none}
 .answer-mode-btn-desc{font-size:12px;color:var(--text2);line-height:1.4}
 
 @media(max-width:640px){nav{padding:0 16px}.screen{padding:16px}.mode-grid{grid-template-columns:1fr}.nav-set-title{display:none}}
+
+/* ── ONBOARDING OVERLAY ── */
+.onboard-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(20, 15, 40, 0.55);
+  backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+  display: flex; align-items: flex-end; justify-content: center;
+  padding: 0 0 env(safe-area-inset-bottom, 0px) 0;
+  animation: obFadeIn .4s ease both;
+}
+@keyframes obFadeIn { from { opacity: 0 } to { opacity: 1 } }
+.onboard-panel {
+  background: var(--glass);
+  border: 1.5px solid var(--glass-border);
+  border-radius: 36px 36px 0 0;
+  padding: 12px 32px 48px;
+  width: 100%; max-width: 540px;
+  box-shadow: 0 -12px 60px rgba(80,60,160,0.18);
+  animation: obSlideUp .45s cubic-bezier(0.34,1.2,0.64,1) both;
+  text-align: center;
+}
+@keyframes obSlideUp {
+  from { opacity: 0; transform: translateY(100px) }
+  to   { opacity: 1; transform: translateY(0) }
+}
+.onboard-handle {
+  width: 44px; height: 5px; border-radius: 3px;
+  background: var(--glass-border); margin: 0 auto 28px;
+}
+.onboard-icon {
+  font-size: 56px; margin-bottom: 16px; display: block;
+  filter: drop-shadow(0 4px 16px rgba(0,98,255,0.25));
+}
+.onboard-title {
+  font-size: 24px; font-weight: 800; letter-spacing: -.5px;
+  margin-bottom: 10px; color: var(--text);
+}
+.onboard-desc {
+  font-size: 15px; color: var(--text2); line-height: 1.65;
+  margin-bottom: 32px; max-width: 380px; margin-left: auto; margin-right: auto;
+}
+.onboard-feature {
+  display: flex; align-items: flex-start; gap: 14px;
+  text-align: left; margin-bottom: 20px;
+  background: var(--accent-light); border-radius: 16px; padding: 14px 16px;
+}
+.onboard-feature-icon {
+  font-size: 26px; flex-shrink: 0; margin-top: 2px;
+}
+.onboard-feature-text strong {
+  display: block; font-size: 14px; font-weight: 800; color: var(--text); margin-bottom: 2px;
+}
+.onboard-feature-text span {
+  font-size: 13px; color: var(--text2); line-height: 1.5;
+}
+.onboard-btn {
+  width: 100%; padding: 16px; border: none; border-radius: 18px;
+  background: linear-gradient(180deg, var(--accent) 0%, var(--accent2) 100%);
+  color: #fff; font-family: var(--font); font-size: 17px; font-weight: 800;
+  cursor: pointer; letter-spacing: -.2px;
+  box-shadow: 0 4px 24px rgba(0,98,255,0.35), inset 1px 1px 0 rgba(255,255,255,0.2);
+  transition: all .2s; margin-top: 8px;
+}
+.onboard-btn:hover { filter: brightness(1.1); transform: scale(1.02) }
+.onboard-btn:active { transform: scale(0.98) }
+
+.settings-dropdown.closing {
+  animation: dropOut .2s cubic-bezier(0.4,0,1,1) both;
+}
+@keyframes dropOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.88) translateY(-8px); }
+}
+
+/* ── DROPDOWN UIT-ANIMATIE ── */
+.settings-dropdown.closing {
+  animation: dropOut .2s cubic-bezier(0.4,0,1,1) both;
+}
+@keyframes dropOut {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.88) translateY(-8px); }
+}
 </style>
 <script>
 if ('serviceWorker' in navigator) {
@@ -334,51 +416,60 @@ if ('serviceWorker' in navigator) {
   <div class="nav-actions" style="display:flex;gap:12px;align-items:center;flex:1;margin-left:20px">
     <div class="nav-spacer" style="flex:1"></div>
     <div id="nav-set-title" class="nav-set-title" style="font-weight:800;font-size:16px;color:var(--text)"></div>
-    <div class="settings-dropdown-wrap" id="set-menu-wrap" style="display:none">
-      <button class="btn-icon" onclick="toggleDD('set-menu')" title="Set menu">
+    <div style="display:none;gap:8px;align-items:center" id="nav-right-btns">
+      <button class="btn-icon" id="help-btn" onclick="showCurrentHelp()" title="Help">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
         </svg>
       </button>
-      <div id="set-menu" class="settings-dropdown" style="display:none;width:240px">
-        <div class="settings-section">
-          <div id="offline-actions">
-            <button class="btn btn-glass" id="btn-offline-toggle" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="toggleOfflineSet()">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M8 17l4 4 4-4M12 21v-8"/></svg>
-              <span id="offline-btn-label">Offline gebruiken</span>
-            </button>
-          </div>
-          <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
-          <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="showShareModal()">
-            <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="translate(-3606.135 1413.942)" fill="var(--text)"><rect width="208" height="208" rx="41" transform="translate(3630 -1366)" opacity=".4"/><path d="M3797.051-1158H3671.22a41.186 41.186 0 0 1-41.22-41.22v-125.831a41.186 41.186 0 0 1 41.22-41.22h20.068v17.356h-20.068a23.89 23.89 0 0 0-23.864 23.864v125.831a23.89 23.89 0 0 0 23.864 23.865h125.831a23.89 23.89 0 0 0 23.865-23.865v-125.831a23.89 23.89 0 0 0-23.865-23.864h-20.068v-17.356h20.067a41.186 41.186 0 0 1 41.22 41.22v125.831a41.185 41.185 0 0 1-41.22 41.22Z" opacity=".6"/><rect width="18" height="132" rx="8" transform="translate(3725 -1363)" opacity=".6"/><path d="M3727.565-1408.569a7.5 7.5 0 0 1 2.879-3.645 7.17 7.17 0 0 1 4.055-1.158 7.34 7.34 0 0 1 4.042 1.3 7.83 7.83 0 0 1 2.855 3.73l23.565 62.058a8.15 8.15 0 0 1-.718 7.249 7.64 7.64 0 0 1-2.537 2.5 7 7 0 0 1-3.518.991l-47.813.565a7.25 7.25 0 0 1-3.659-.927 7.65 7.65 0 0 1-2.65-2.5 8.1 8.1 0 0 1-1.261-3.491 8.2 8.2 0 0 1 .508-3.912Z"/></g></svg>
-            Delen
-          </button>
-          <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="showCombineSetsModal()">
-            <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2854 -334)"><path data-name="Rectangle 17" fill="rgba(152,37,37,0)" d="M2854 334h256v256h-256z"/><rect data-name="Rectangle 37" width="164" height="164" rx="33" transform="translate(2854 380)" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="164" height="164" rx="33" transform="translate(2946 380)" fill="var(--text)" opacity=".4"/><rect data-name="Rectangle 39" width="72" height="164" rx="31" transform="translate(2946 380)" fill="var(--text)"/></g></svg>
-            Sets combineren
-          </button>
-          <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="makeCopyOfSet()">
-            <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="translate(-3611 1401)" fill="var(--text)"><rect width="193" height="193" rx="33" transform="translate(3660 -1357)" opacity=".4"/><rect width="193" height="193" rx="33" transform="translate(3626 -1382)"/></g></svg>
-            Kopie maken
-          </button>
-          <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="printSetPDF()">
-            <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g fill="var(--text)"><path d="M199.168 33.443H58.112a25.67 25.67 0 0 1 8.789-14.622 25.5 25.5 0 0 1 7.487-4.3 25.5 25.5 0 0 1 8.812-1.558h90.88a25.5 25.5 0 0 1 8.811 1.557 25.5 25.5 0 0 1 7.487 4.3 25.67 25.67 0 0 1 8.789 14.62Z" opacity=".6"/><path d="M218.88 174.243H37.12A37.09 37.09 0 0 1 0 137.123v-66.56a37.09 37.09 0 0 1 37.12-37.12h181.76A37.09 37.09 0 0 1 256 70.563v66.56a37.09 37.09 0 0 1-37.12 37.12M46.721 37.283a5.76 5.76 0 1 0 5.76 5.76 5.767 5.767 0 0 0-5.76-5.76" opacity=".4"/><path d="M58.409 104.464h140.983v113.273a20 20 0 0 1-20 20H78.409a20 20 0 0 1-20-20z"/></g></svg>
-            Afdrukken
-          </button>
-          <div id="local-set-actions" style="display:none">
+      <div class="settings-dropdown-wrap" id="set-menu-wrap">
+        <button class="btn-icon" onclick="toggleDD('set-menu')" title="Set menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/>
+          </svg>
+        </button>
+        <div id="set-menu" class="settings-dropdown" style="display: none; width:240px">
+          <div class="settings-section">
+            <div id="offline-actions">
+              <button class="btn btn-glass" id="btn-offline-toggle" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="toggleOfflineSet()">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2a10 10 0 0 1 10 10"/><path d="M12 6v6l4 2"/><circle cx="12" cy="12" r="10" opacity=".3"/><path d="M8 17l4 4 4-4M12 21v-8"/></svg>
+                <span id="offline-btn-label">Offline gebruiken</span>
+              </button>
+            </div>
             <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
-            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="downloadVset()">
-              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><path data-name="Path 186" d="m2433 1108 5.667-3.964h240.488L2689 1108v45a29 29 0 0 1-29 29h-198a29 29 0 0 1-29-29Z" fill="var(--text)" opacity=".4"/><path data-name="Path 185" d="M2462 1182a28.8 28.8 0 0 1-11.288-2.279 28.9 28.9 0 0 1-9.219-6.214 28.9 28.9 0 0 1-6.215-9.218A28.8 28.8 0 0 1 2433 1153v-43.5h.021a6 6 0 0 1 5.979-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a9.01 9.01 0 0 0 9 9h198a9.01 9.01 0 0 0 9-9v-43.5h.021a6 6 0 0 1 5.978-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a28.8 28.8 0 0 1-2.279 11.289 28.9 28.9 0 0 1-6.214 9.218 28.9 28.9 0 0 1-9.219 6.214A28.8 28.8 0 0 1 2660 1182Z" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="30" height="170" rx="15" transform="translate(2546 940)" fill="var(--text)"/><path data-name="Polygon 1" d="M2567.1 1134.365a9 9 0 0 1-12.209 0l-41.981-38.752a9 9 0 0 1 6.109-15.613h83.962a9 9 0 0 1 6.1 15.613Z" fill="var(--text)"/></g></svg>
-              Set downloaden (.vset)
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="showShareModal()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="translate(-3606.135 1413.942)" fill="var(--text)"><rect width="208" height="208" rx="41" transform="translate(3630 -1366)" opacity=".4"/><path d="M3797.051-1158H3671.22a41.186 41.186 0 0 1-41.22-41.22v-125.831a41.186 41.186 0 0 1 41.22-41.22h20.068v17.356h-20.068a23.89 23.89 0 0 0-23.864 23.864v125.831a23.89 23.89 0 0 0 23.864 23.865h125.831a23.89 23.89 0 0 0 23.865-23.865v-125.831a23.89 23.89 0 0 0-23.865-23.864h-20.068v-17.356h20.067a41.186 41.186 0 0 1 41.22 41.22v125.831a41.185 41.185 0 0 1-41.22 41.22Z" opacity=".6"/><rect width="18" height="132" rx="8" transform="translate(3725 -1363)" opacity=".6"/><path d="M3727.565-1408.569a7.5 7.5 0 0 1 2.879-3.645 7.17 7.17 0 0 1 4.055-1.158 7.34 7.34 0 0 1 4.042 1.3 7.83 7.83 0 0 1 2.855 3.73l23.565 62.058a8.15 8.15 0 0 1-.718 7.249 7.64 7.64 0 0 1-2.537 2.5 7 7 0 0 1-3.518.991l-47.813.565a7.25 7.25 0 0 1-3.659-.927 7.65 7.65 0 0 1-2.65-2.5 8.1 8.1 0 0 1-1.261-3.491 8.2 8.2 0 0 1 .508-3.912Z"/></g></svg>
+              Delen
             </button>
-            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="editCurrentSet()">
-              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 17" fill="rgba(152,37,37,0)" d="M0 0h256v256H0z"/><g data-name="Group 13" transform="rotate(45 2187.158 -2777.125)" fill="var(--text)"><path data-name="Path 170" d="M2785 888.133a7.9 7.9 0 0 1-3.778-.941 7 7 0 0 1-2.831-2.824l-17.6-32.459a6.4 6.4 0 0 1-.779-2.688h49.978a6.4 6.4 0 0 1-.779 2.688l-17.6 32.459a7.03 7.03 0 0 1-2.831 2.824 7.9 7.9 0 0 1-3.78.941m25-54.655h-50V600.523a21.35 21.35 0 0 1 1.965-8.969 23 23 0 0 1 5.358-7.324 25.1 25.1 0 0 1 7.947-4.938 26.7 26.7 0 0 1 9.731-1.811 26.7 26.7 0 0 1 9.731 1.811 25.1 25.1 0 0 1 7.947 4.938 23 23 0 0 1 5.358 7.324 21.4 21.4 0 0 1 1.965 8.969v232.954Zm-24.5-237.083c-4.687 0-8.5 3.515-8.5 7.834v216.6c0 4.32 3.813 7.835 8.5 7.835s8.5-3.515 8.5-7.835v-216.6c0-4.32-3.81-7.835-8.499-7.835Z"/><rect data-name="Rectangle 19" width="17" height="232.271" rx="8.5" transform="translate(2777 596.393)" opacity=".6"/></g></svg>
-              Set bewerken
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="showCombineSetsModal()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2854 -334)"><path data-name="Rectangle 17" fill="rgba(152,37,37,0)" d="M2854 334h256v256h-256z"/><rect data-name="Rectangle 37" width="164" height="164" rx="33" transform="translate(2854 380)" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="164" height="164" rx="33" transform="translate(2946 380)" fill="var(--text)" opacity=".4"/><rect data-name="Rectangle 39" width="72" height="164" rx="31" transform="translate(2946 380)" fill="var(--text)"/></g></svg>
+              Sets combineren
             </button>
-            <button class="btn" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:0;text-align:left;justify-content:flex-start;gap:8px;background:rgba(232,58,74,0.08);color:var(--red);border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-weight:700" onclick="deleteCurrentSet()">
-              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M0 0h256v256H0z"/><g data-name="Group 15" fill="var(--red)"><path data-name="Path 181" d="M190.628 256H66.231a22.12 22.12 0 0 1-15.521-6.256 20.93 20.93 0 0 1-6.429-15.1L27.774 72.076a20.93 20.93 0 0 1 6.429-15.1 22.12 22.12 0 0 1 15.521-6.259h155.345a22.12 22.12 0 0 1 15.521 6.256 20.93 20.93 0 0 1 6.429 15.1l-14.445 162.568a20.93 20.93 0 0 1-6.429 15.1A22.12 22.12 0 0 1 190.628 256M162.914 74.908a12.03 12.03 0 0 0-12.061 11.654l-4.635 132.749a12.09 12.09 0 0 0 11.646 12.489q.201.008.429.008a12.025 12.025 0 0 0 12.06-11.654l4.636-132.749a12.075 12.075 0 0 0-11.646-12.488 10 10 0 0 0-.429-.009m-69.829 0q-.215-.002-.429.007a12.09 12.09 0 0 0-11.646 12.49l4.635 132.749a12.025 12.025 0 0 0 12.059 11.654q.23.002.43-.008a12.09 12.09 0 0 0 11.647-12.489l-4.635-132.749a12.026 12.026 0 0 0-12.061-11.654"/><path data-name="Path 179" d="M30.793 41.057A8.453 8.453 0 0 1 22.34 32.6a16.906 16.906 0 0 1 16.906-16.9h27.773A15.7 15.7 0 0 1 82.718 0h90.566a15.7 15.7 0 0 1 15.7 15.7h27.774a16.906 16.906 0 0 1 16.902 16.9 8.45 8.45 0 0 1-8.452 8.453Z"/><path data-name="Path 180" d="M157.86 231.8a12.075 12.075 0 0 1-11.646-12.489l4.639-132.746a12.076 12.076 0 0 1 24.137.843l-4.637 132.746a12.076 12.076 0 0 1-12.061 11.654q-.212 0-.432-.008m-72.214-11.646L81.01 87.405a12.075 12.075 0 0 1 24.136-.84l4.636 132.749a12.075 12.075 0 0 1-11.647 12.489c-.143 0-.287.007-.429.007a12.076 12.076 0 0 1-12.06-11.656" opacity=".4"/></g></svg>
-              Set verwijderen
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="makeCopyOfSet()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g transform="translate(-3611 1401)" fill="var(--text)"><rect width="193" height="193" rx="33" transform="translate(3660 -1357)" opacity=".4"/><rect width="193" height="193" rx="33" transform="translate(3626 -1382)"/></g></svg>
+              Kopie maken
             </button>
+            <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="printSetPDF()">
+              <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256"><g fill="var(--text)"><path d="M199.168 33.443H58.112a25.67 25.67 0 0 1 8.789-14.622 25.5 25.5 0 0 1 7.487-4.3 25.5 25.5 0 0 1 8.812-1.558h90.88a25.5 25.5 0 0 1 8.811 1.557 25.5 25.5 0 0 1 7.487 4.3 25.67 25.67 0 0 1 8.789 14.62Z" opacity=".6"/><path d="M218.88 174.243H37.12A37.09 37.09 0 0 1 0 137.123v-66.56a37.09 37.09 0 0 1 37.12-37.12h181.76A37.09 37.09 0 0 1 256 70.563v66.56a37.09 37.09 0 0 1-37.12 37.12M46.721 37.283a5.76 5.76 0 1 0 5.76 5.76 5.767 5.767 0 0 0-5.76-5.76" opacity=".4"/><path d="M58.409 104.464h140.983v113.273a20 20 0 0 1-20 20H78.409a20 20 0 0 1-20-20z"/></g></svg>
+              Afdrukken
+            </button>
+            <div id="local-set-actions" style="display:none">
+              <div style="height:1px;background:rgba(180,170,210,0.3);margin:8px 0"></div>
+              <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="downloadVset()">
+                <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><g transform="translate(-2433 -926)"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M2433 926h256v256h-256z"/><path data-name="Path 186" d="m2433 1108 5.667-3.964h240.488L2689 1108v45a29 29 0 0 1-29 29h-198a29 29 0 0 1-29-29Z" fill="var(--text)" opacity=".4"/><path data-name="Path 185" d="M2462 1182a28.8 28.8 0 0 1-11.288-2.279 28.9 28.9 0 0 1-9.219-6.214 28.9 28.9 0 0 1-6.215-9.218A28.8 28.8 0 0 1 2433 1153v-43.5h.021a6 6 0 0 1 5.979-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a9.01 9.01 0 0 0 9 9h198a9.01 9.01 0 0 0 9-9v-43.5h.021a6 6 0 0 1 5.978-5.5h8a6 6 0 0 1 5.98 5.5h.021v43.5a28.8 28.8 0 0 1-2.279 11.289 28.9 28.9 0 0 1-6.214 9.218 28.9 28.9 0 0 1-9.219 6.214A28.8 28.8 0 0 1 2660 1182Z" fill="var(--text)" opacity=".6"/><rect data-name="Rectangle 38" width="30" height="170" rx="15" transform="translate(2546 940)" fill="var(--text)"/><path data-name="Polygon 1" d="M2567.1 1134.365a9 9 0 0 1-12.209 0l-41.981-38.752a9 9 0 0 1 6.109-15.613h83.962a9 9 0 0 1 6.1 15.613Z" fill="var(--text)"/></g></svg>
+                Set downloaden (.vset)
+              </button>
+              <button class="btn btn-glass" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:6px;text-align:left;justify-content:flex-start;gap:8px" onclick="editCurrentSet()">
+                <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 17" fill="rgba(152,37,37,0)" d="M0 0h256v256H0z"/><g data-name="Group 13" transform="rotate(45 2187.158 -2777.125)" fill="var(--text)"><path data-name="Path 170" d="M2785 888.133a7.9 7.9 0 0 1-3.778-.941 7 7 0 0 1-2.831-2.824l-17.6-32.459a6.4 6.4 0 0 1-.779-2.688h49.978a6.4 6.4 0 0 1-.779 2.688l-17.6 32.459a7.03 7.03 0 0 1-2.831 2.824 7.9 7.9 0 0 1-3.78.941m25-54.655h-50V600.523a21.35 21.35 0 0 1 1.965-8.969 23 23 0 0 1 5.358-7.324 25.1 25.1 0 0 1 7.947-4.938 26.7 26.7 0 0 1 9.731-1.811 26.7 26.7 0 0 1 9.731 1.811 25.1 25.1 0 0 1 7.947 4.938 23 23 0 0 1 5.358 7.324 21.4 21.4 0 0 1 1.965 8.969v232.954Zm-24.5-237.083c-4.687 0-8.5 3.515-8.5 7.834v216.6c0 4.32 3.813 7.835 8.5 7.835s8.5-3.515 8.5-7.835v-216.6c0-4.32-3.81-7.835-8.499-7.835Z"/><rect data-name="Rectangle 19" width="17" height="232.271" rx="8.5" transform="translate(2777 596.393)" opacity=".6"/></g></svg>
+                Set bewerken
+              </button>
+              <button class="btn" style="width:100%;padding:8px 12px;font-size:13px;margin-bottom:0;text-align:left;justify-content:flex-start;gap:8px;background:rgba(232,58,74,0.08);color:var(--red);border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-weight:700" onclick="deleteCurrentSet()">
+                <svg width="13" height="13" xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256"><path data-name="Rectangle 20" fill="rgba(0,0,0,0)" d="M0 0h256v256H0z"/><g data-name="Group 15" fill="var(--red)"><path data-name="Path 181" d="M190.628 256H66.231a22.12 22.12 0 0 1-15.521-6.256 20.93 20.93 0 0 1-6.429-15.1L27.774 72.076a20.93 20.93 0 0 1 6.429-15.1 22.12 22.12 0 0 1 15.521-6.259h155.345a22.12 22.12 0 0 1 15.521 6.256 20.93 20.93 0 0 1 6.429 15.1l-14.445 162.568a20.93 20.93 0 0 1-6.429 15.1A22.12 22.12 0 0 1 190.628 256M162.914 74.908a12.03 12.03 0 0 0-12.061 11.654l-4.635 132.749a12.09 12.09 0 0 0 11.646 12.489q.201.008.429.008a12.025 12.025 0 0 0 12.06-11.654l4.636-132.749a12.075 12.075 0 0 0-11.646-12.488 10 10 0 0 0-.429-.009m-69.829 0q-.215-.002-.429.007a12.09 12.09 0 0 0-11.646 12.49l4.635 132.749a12.025 12.025 0 0 0 12.059 11.654q.23.002.43-.008a12.09 12.09 0 0 0 11.647-12.489l-4.635-132.749a12.026 12.026 0 0 0-12.061-11.654"/><path data-name="Path 179" d="M30.793 41.057A8.453 8.453 0 0 1 22.34 32.6a16.906 16.906 0 0 1 16.906-16.9h27.773A15.7 15.7 0 0 1 82.718 0h90.566a15.7 15.7 0 0 1 15.7 15.7h27.774a16.906 16.906 0 0 1 16.902 16.9 8.45 8.45 0 0 1-8.452 8.453Z"/><path data-name="Path 180" d="M157.86 231.8a12.075 12.075 0 0 1-11.646-12.489l4.639-132.746a12.076 12.076 0 0 1 24.137.843l-4.637 132.746a12.076 12.076 0 0 1-12.061 11.654q-.212 0-.432-.008m-72.214-11.646L81.01 87.405a12.075 12.075 0 0 1 24.136-.84l4.636 132.749a12.075 12.075 0 0 1-11.647 12.489c-.143 0-.287.007-.429.007a12.076 12.076 0 0 1-12.06-11.656" opacity=".4"/></g></svg>
+                Set verwijderen
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -480,6 +571,104 @@ async function loadServerSets(){
   return {};
 }
 
+/* ══════════════════════════════════════════
+   ONBOARDING (set.html)
+══════════════════════════════════════════ */
+const ONBOARD_DEFS = {
+  set: {
+    icon: '🗂️',
+    title: 'Een set geopend!',
+    desc: 'Kies een oefenmodus om te beginnen, of bekijk alle begrippen hieronder.',
+    features: [
+      { icon: '⚡', title: 'Flitskaarten', desc: 'Handig voor lange definities. Klik om de kaart om te draaien.' },
+      { icon: '🧠', title: 'Stampen', desc: 'Typ het antwoord in — de meest effectieve methode.' },
+      { icon: '📝', title: 'Overhoren', desc: 'Maak een volledige oefentoets en zie je score achteraf.' },
+    ]
+  },
+  flashcards: {
+    icon: '⚡',
+    title: 'Flitskaarten',
+    desc: 'Klik op de kaart om hem om te draaien. Geef aan of je het wist of niet.',
+    features: [
+      { icon: '→', title: 'Wist ik!', desc: 'Druk op de groene knop of pijltje rechts.' },
+      { icon: '←', title: 'Wist ik niet', desc: 'Druk op de rode knop of pijltje links.' },
+      { icon: '⎵', title: 'Omdraaien', desc: 'Druk op spatie of klik op de kaart.' },
+    ]
+  },
+  stampen: {
+    icon: '🧠',
+    title: 'Stampen',
+    desc: 'Type het juiste antwoord in. Fouten komen automatisch terug voor herhaling.',
+    features: [
+      { icon: '✓', title: 'Correct antwoord', desc: 'Tikfouten worden soepel beoordeeld.' },
+      { icon: '↩️', title: 'Herhaling', desc: 'Fout beantwoorde termen komen na een checkpoint terug.' },
+      { icon: '🔥', title: 'Streak', desc: 'Bouw een reeks op door opeenvolgende goede antwoorden.' },
+    ]
+  },
+  overhoren: {
+    icon: '📝',
+    title: 'Overhoren',
+    desc: 'Beantwoord alle vragen en lever dan in. Je ziet het resultaat pas daarna.',
+    features: [
+      { icon: '🔀', title: 'Meerkeuze of open', desc: 'Kies je voorkeur via de instellingen.' },
+      { icon: '✏️', title: 'Wijzigen', desc: 'Je kunt antwoorden aanpassen vóór het inleveren.' },
+      { icon: '📊', title: 'Resultaten', desc: 'Na het inleveren zie je elk antwoord terug met de correctie.' },
+    ]
+  }
+};
+
+function showOnboarding(key, force = false) {
+  const seen = JSON.parse(localStorage.getItem('sd_onboard') || '{}');
+  if (!force && seen[key]) return;
+  seen[key] = true;
+  localStorage.setItem('sd_onboard', JSON.stringify(seen));
+  const d = ONBOARD_DEFS[key];
+  if (!d) return;
+  const el = document.createElement('div');
+  el.className = 'onboard-overlay';
+  el.id = 'onboard-overlay';
+  el.innerHTML = `
+    <div class="onboard-panel">
+      <div class="onboard-handle"></div>
+      <span class="onboard-icon">${d.icon}</span>
+      <div class="onboard-title">${d.title}</div>
+      <div class="onboard-desc">${d.desc}</div>
+      ${(d.features||[]).map(f=>`
+        <div class="onboard-feature">
+          <div class="onboard-feature-icon">${f.icon}</div>
+          <div class="onboard-feature-text">
+            <strong>${f.title}</strong>
+            <span>${f.desc}</span>
+          </div>
+        </div>`).join('')}
+      <button class="onboard-btn" onclick="closeOnboarding()">Verdergaan</button>
+    </div>`;
+  document.body.appendChild(el);
+}
+
+function closeOnboarding() {
+  const el = document.getElementById('onboard-overlay');
+  if (!el) return;
+  el.style.pointerEvents = 'none';
+  el.style.animation = 'none';
+  const panel = el.querySelector('.onboard-panel');
+  if (panel) {
+    panel.style.animation = 'none';
+    panel.style.transition = 'transform .4s cubic-bezier(0.4,0,1,1), opacity .35s ease';
+    panel.style.transform = 'translateY(110%)';
+    panel.style.opacity = '0';
+  }
+  el.style.transition = 'opacity .4s ease';
+  el.style.opacity = '0';
+  setTimeout(() => el.remove(), 420);
+}
+
+function showCurrentHelp() {
+  const modeMap = { flashcards:'flashcards', stampen:'stampen', overhoren:'overhoren' };
+  const key = modeMap[currentMode] || 'set';
+  showOnboarding(key, true);
+}
+
 async function boot(){
   loadThemeSettings();
   const params=new URLSearchParams(window.location.search);
@@ -523,7 +712,9 @@ function isLocalSet(s){
 function renderSetView(){
   document.title=`${SET.title} — Velios+`;
   document.getElementById('nav-set-title').textContent=SET.title;
-  document.getElementById('set-menu-wrap').style.display='flex';
+const navRight = document.getElementById('nav-right-btns');
+if (navRight) navRight.style.display = 'flex';
+showOnboarding('set');
 
   const localActions=document.getElementById('local-set-actions');
   if(localActions) localActions.style.display=isLocalSet(SET)?'block':'none';
@@ -565,9 +756,9 @@ function startMode(mode){
   currentMode=mode;
   const el=document.getElementById('main-screen');
   el.style.animation='none';el.offsetHeight;el.style.animation='iosOpen .45s cubic-bezier(0.34,1.3,0.64,1) both';
-  if(mode==='flashcards')renderFlashcards();
-  else if(mode==='stampen')renderStampen();
-  else if(mode==='overhoren')renderOverhoren();
+  if(mode==='flashcards'){renderFlashcards();showOnboarding('flashcards');}
+  else if(mode==='stampen'){renderStampen();showOnboarding('stampen');}
+  else if(mode==='overhoren'){renderOverhoren();showOnboarding('overhoren');}
 }
 function backToSet(){
   const el=document.getElementById('main-screen');
@@ -1251,7 +1442,13 @@ function showMilestone(n){const msgs={5:'5 op rij!',10:'10 op rij!',15:'15 op ri
 /* ── DROPDOWN ── */
 let openDD=null;
 function toggleDD(id){const el=document.getElementById(id);if(!el)return;if(openDD&&openDD!==id)closeDD(openDD);if(el.style.display==='none'||!el.style.display){el.style.display='block';openDD=id;}else closeDD(id);}
-function closeDD(id){const el=document.getElementById(id);if(el)el.style.display='none';if(openDD===id)openDD=null;}
+function closeDD(id){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.classList.add('closing');
+  setTimeout(()=>{ el.classList.remove('closing'); el.style.display='none'; },200);
+  if(openDD===id)openDD=null;
+}
 document.addEventListener('click',e=>{if(openDD&&!e.target.closest('.settings-dropdown-wrap'))closeDD(openDD);});
 
 /* ── MODAL / TOAST ── */
