@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<script src="sw-register.js?v=20260817-54"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Velios+">
+<meta id="theme-meta" name="theme-color" content="#f0eef9">
+<title>Velios+ — Account beheren</title>
+<link rel="icon" href="favicon.svg" media="(prefers-color-scheme: light)">
+<link rel="icon" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-grad:linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%);
+  --glass:rgba(255,255,255,0.92);
+  --glass2:rgba(255,255,255,0.80);
+  --glass-border:rgba(200,195,230,0.6);
+  --glass-shadow:0 2px 8px rgba(0,98,255,0.1),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
+  --glass-shadow-lg:0 8px 32px rgba(0,98,255,0.15),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
+  --text:#0b0f2a;--text2:#3d3a55;--text3:#7c7899;
+  --accent:#ff9f0a;--accent2:#e47f00;--accent-light:rgba(255,159,10,0.14);--accent-contrast:#fff;
+  --green:#18b672;--red:#e83a4a;--orange:#f07b20;
+  --r:30px;--r2:36px;--r3:34px;--r4:30px;
+  --font:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0,0,.47,1.15);
+  --ease2:cubic-bezier(0.34,1.56,0.64,1);
+  --nav-h:calc(72px + env(safe-area-inset-top,0px));
+}
+html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+body{min-height:100dvh;background:var(--bg-grad);background-attachment:fixed;display:flex;flex-direction:column;-webkit-touch-callout:none;}
+
+body.dark-mode{--bg-grad:linear-gradient(180deg,#0a0812 0%,#10091e 100%);--glass:rgba(22,20,34,0.96);--glass2:rgba(22,20,34,0.85);--glass-border:rgba(64,60,100,0.6);--text:#fff;--text2:#c8c4e0;--text3:rgba(255,255,255,0.45);--glass-shadow:0 2px 10px rgba(0,0,0,0.6),inset 1px 1px 0 rgba(80,75,120,0.5);--glass-shadow-lg:0 8px 32px rgba(0,0,0,0.7),inset 1px 1px 0 rgba(80,75,120,0.5);}
+body.dark-mode input{background:rgba(38,36,58,0.95)!important;border-color:var(--glass-border)!important;color:var(--text)!important;}
+body.dark-mode input:focus{background:rgba(48,46,72,0.99)!important;border-color:var(--accent)!important;}
+body.dark-mode input::placeholder{color:var(--text3)!important;}
+
+nav{position:sticky;top:0;z-index:200;background:rgba(240,238,249,0.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(200,195,230,0.5);padding:env(safe-area-inset-top,0px) 28px 0;height:var(--nav-h);display:flex;align-items:center;gap:16px;transition:background .3s;}
+body.dark-mode nav{background:rgba(10,8,20,0.97)!important;border-color:var(--glass-border)!important;}
+.nav-back{width:40px;height:40px;border-radius:var(--r3);background:var(--glass);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s var(--ease);flex-shrink:0;color:var(--text2);}
+.nav-back:hover{background:#fff;transform:scale(1.08);box-shadow:var(--glass-shadow-lg);}
+.nav-back svg{width:18px;height:18px;}
+.nav-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;color:var(--text);}
+.nav-spacer{flex:1;}
+
+.main{max-width:680px;margin:0 auto;padding:32px 28px 100px;width:100%;}
+@media(max-width:750px){.main{padding:20px 16px 100px;}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* SECTION CARD */
+.section-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);overflow:hidden;box-shadow:var(--glass-shadow);margin-bottom:20px;animation:fadeUp .4s var(--ease2) both;}
+.section-card:nth-child(1){animation-delay:0s}
+.section-card:nth-child(2){animation-delay:.06s}
+.section-card:nth-child(3){animation-delay:.12s}
+.section-card:nth-child(4){animation-delay:.18s}
+.section-card:nth-child(5){animation-delay:.24s}
+.section-card:nth-child(6){animation-delay:.30s}
+.section-card-header{padding:15px 22px 13px;border-bottom:1px solid rgba(200,195,230,0.25);display:flex;align-items:center;gap:8px;}
+.section-card-icon{font-size:17px;flex-shrink:0;}
+.section-card-title{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.1px;}
+.section-card-body{padding:20px 22px;}
+
+/* AVATAR SECTION */
+.avatar-current-row{display:flex;align-items:center;gap:18px;margin-bottom:20px;}
+.avatar-big{width:72px;height:72px;border-radius:20px;overflow:hidden;flex-shrink:0;box-shadow:0 4px 16px var(--accent-light);position:relative;}
+.avatar-big img{width:100%;height:100%;object-fit:cover;}
+.avatar-big-emoji{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:36px;}
+.avatar-big-info h3{font-size:15px;font-weight:800;color:var(--text);margin-bottom:3px;}
+.avatar-big-info p{font-size:12px;color:var(--text3);font-weight:600;line-height:1.5;}
+
+/* PRESET GRID */
+.avatar-grid-label{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;}
+.avatar-preset-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+@media(max-width:400px){.avatar-preset-grid{grid-template-columns:repeat(4,1fr);}}
+.avatar-preset{
+  aspect-ratio:1;border-radius:16px;overflow:hidden;cursor:pointer;
+  border:2.5px solid transparent;transition:all .2s var(--ease2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;padding:0;font-family:var(--font);
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.avatar-preset:hover{transform:scale(1.1);box-shadow:0 4px 16px rgba(0,98,255,0.15);}
+.avatar-preset.selected{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light),0 4px 16px rgba(0,98,255,0.15);transform:scale(1.08);}
+.avatar-preset img{width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.avatar-classic{margin-top:16px;}
+.avatar-classic summary{
+  min-height:44px;padding:0 17px;border:1px solid var(--glass-border);border-radius:999px;
+  background:var(--input-bg);color:var(--text);font-size:13px;font-weight:800;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;list-style:none;
+}
+.avatar-classic summary::-webkit-details-marker{display:none;}
+.avatar-classic-chevron{width:17px;height:17px;transition:transform .2s ease;}
+.avatar-classic[open] .avatar-classic-chevron{transform:rotate(180deg);}
+.avatar-classic .avatar-preset-grid{margin-top:12px;}
+
+.btn-save-avatar{margin-top:16px;height:42px;padding:0 22px;border-radius:var(--r3);background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s var(--ease2);box-shadow:0 2px 12px var(--accent-light),inset 1px 1px 0 rgba(255,255,255,0.2);display:inline-flex;align-items:center;gap:8px;}
+.btn-save-avatar:hover:not(:disabled){filter:brightness(1.12);transform:scale(1.03);}
+.btn-save-avatar:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+
+/* FORM */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field:last-of-type{margin-bottom:0;}
+.field label{font-size:13px;font-weight:700;color:var(--text2);}
+.field input{height:46px;background:rgba(255,255,255,0.88);border:1.5px solid var(--glass-border);border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;padding:0 16px;outline:none;transition:all .2s;width:100%;-webkit-appearance:none;}
+.field input:focus{border-color:var(--accent);background:rgba(255,255,255,.99);box-shadow:0 0 0 3px var(--accent-light);}
+.field input.ok{border-color:var(--green);}
+.field input.error{border-color:var(--red);box-shadow:0 0 0 3px rgba(232,58,74,0.1);}
+.field-hint{font-size:11px;color:var(--text3);font-weight:600;margin-top:2px;}
+.field-error{font-size:12px;color:var(--red);font-weight:600;display:none;margin-top:2px;}
+.field-error.show{display:block;}
+.username-wrap{position:relative;display:flex;align-items:center;}
+.username-at{position:absolute;left:14px;font-size:15px;font-weight:700;color:var(--text3);pointer-events:none;z-index:1;}
+.username-wrap input{padding-left:28px;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:44px;}
+.pw-toggle{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;display:flex;align-items:center;}
+.pw-toggle:hover{color:var(--text);}
+.pw-toggle svg{width:18px;height:18px;}
+.pw-strength{display:flex;gap:4px;margin-top:6px;}
+.pw-bar{height:3px;flex:1;border-radius:2px;background:rgba(200,195,230,0.4);transition:background .3s;}
+.pw-bar.weak{background:var(--red);}
+.pw-bar.medium{background:#f59e0b;}
+.pw-bar.strong{background:var(--green);}
+.pw-label{font-size:11px;color:var(--text3);margin-top:3px;font-weight:600;}
+
+.btn-save{height:44px;padding:0 24px;border-radius:var(--r3);background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);border:none;color:#fff;font-family:var(--font);font-size:14px;font-weight:800;cursor:pointer;transition:all .2s var(--ease2);box-shadow:0 2px 12px var(--accent-light),inset 1px 1px 0 rgba(255,255,255,0.2);display:inline-flex;align-items:center;gap:8px;margin-top:4px;}
+.btn-save:hover:not(:disabled){filter:brightness(1.12);transform:scale(1.03);}
+.btn-save:active:not(:disabled){transform:scale(0.98);}
+.btn-save:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+
+/* SESSION */
+.session-item{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:12px 14px;background:rgba(255,255,255,0.5);border:1px solid rgba(200,195,230,0.3);border-radius:14px;}
+body.dark-mode .session-item{background:rgba(40,38,60,0.5)!important;border-color:var(--glass-border)!important;}
+.session-item.current-session{background:var(--accent-light)!important;border-color:rgba(0,98,255,0.25)!important;}
+.session-icon{width:36px;height:36px;border-radius:10px;background:rgba(0,98,255,0.1);display:flex;align-items:center;justify-content:center;color:var(--accent);flex-shrink:0;}
+.session-icon svg{width:18px;height:18px;}
+.session-name{font-size:13px;font-weight:700;color:var(--text);}
+.session-meta{font-size:11px;color:var(--text3);font-weight:600;margin-top:1px;}
+.session-badge{font-size:10px;font-weight:800;color:var(--accent);background:var(--accent-light);padding:2px 8px;border-radius:20px;white-space:nowrap;}
+
+/* DANGER */
+.danger-section{border-color:rgba(232,58,74,0.25)!important;}
+.danger-section .section-card-header{background:rgba(232,58,74,0.04);}
+.danger-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0;border-bottom:1px solid rgba(200,195,230,0.2);}
+.danger-row:last-child{border-bottom:none;padding-bottom:0;}
+.danger-row-text h4{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.danger-row-text p{font-size:12px;color:var(--text3);font-weight:600;line-height:1.5;}
+.btn-danger{height:36px;padding:0 16px;border-radius:var(--r4);background:rgba(232,58,74,0.08);border:1px solid rgba(232,58,74,0.2);color:var(--red);font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0;}
+.btn-danger:hover{background:rgba(232,58,74,0.16);}
+.btn-danger-solid{height:36px;padding:0 16px;border-radius:var(--r4);background:var(--red);border:none;color:#fff;font-family:var(--font);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;flex-shrink:0;}
+.btn-danger-solid:hover{filter:brightness(1.1);}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(140,130,185,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;}
+.modal-panel{background:rgba(255,255,255,0.99);border:1.5px solid var(--glass-border);border-radius:var(--r2);padding:26px;width:90%;max-width:400px;box-shadow:0 16px 64px rgba(80,60,160,0.22);animation:fadeUp .3s var(--ease2) both;}
+body.dark-mode .modal-panel{background:rgb(16,14,26)!important;border-color:var(--glass-border)!important;}
+.modal-title{font-size:17px;font-weight:800;margin-bottom:7px;color:var(--text);}
+.modal-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;}
+.modal-confirm-field{margin:0 0 16px;}
+.modal-confirm-field input{height:44px;background:rgba(255,255,255,0.88);border:1.5px solid var(--glass-border);border-radius:var(--r3);color:var(--text);font-family:var(--font);font-size:15px;padding:0 16px;outline:none;width:100%;transition:all .2s;}
+.modal-confirm-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-light);}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s;outline:none;}
+.btn-glass{background:var(--glass);color:var(--text);box-shadow:var(--glass-shadow);border:1px solid var(--glass-border);}
+.btn-glass:hover{background:rgba(255,255,255,.95);transform:scale(1.03);}
+.btn-red{background:var(--red);color:#fff;box-shadow:0 2px 10px rgba(232,58,74,0.3);}
+.btn-red:hover{filter:brightness(1.1);transform:scale(1.03);}
+.btn-red:disabled{opacity:.5;cursor:not-allowed;filter:none;transform:none;}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:16px;height:16px;border:2.5px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+.spinner-accent{border-color:rgba(0,98,255,0.15);border-top-color:var(--accent);}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,.99);border:1px solid rgba(200,195,230,.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.ok{background:#f0fdf8;border-color:rgba(24,182,114,.3);color:var(--green);}
+#toast.err{background:#fff0f1;border-color:rgba(232,58,74,.3);color:var(--red);}
+@media(max-width:750px){#toast{bottom:calc(env(safe-area-inset-bottom,0px)+16px);left:16px;right:16px;text-align:center;}}
+
+/* Vernieuwde, vlakke accountstijl */
+:root{--bg-grad:#f2f2f7;--input-bg:#f7f7f8;--glass:#fff;--glass2:#fff;--glass-border:#dedee5;--glass-shadow:none;--glass-shadow-lg:none;--text:#0b1029;--text2:#45465a;--text3:#77798b;--r:30px;--r2:36px;--r3:34px;--r4:30px}
+body.dark-mode{--bg-grad:#000;--input-bg:#2c2c2e;--glass:#1c1c1e;--glass2:#1c1c1e;--glass-border:#343438;--text:#fff;--text2:#d0d0d6;--text3:#8e8e93;--glass-shadow:none;--glass-shadow-lg:none}
+nav,body.dark-mode nav{background:var(--bg-grad)!important;border-color:var(--glass-border)!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.nav-back{background:var(--glass);box-shadow:none;border-radius:50%}.nav-back:hover{background:var(--glass);box-shadow:none;transform:none}
+.section-card{box-shadow:none;border-radius:var(--r2);animation:none}.section-card-header{padding:18px 22px;border-color:var(--glass-border)}
+.section-card-icon{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:var(--accent-light);color:var(--accent)}
+.section-card-icon svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.avatar-big,.avatar-preset{border-radius:50%;box-shadow:none}.avatar-big-emoji{font-size:24px;color:#fff;font-weight:800}.avatar-preset:hover,.avatar-preset.selected{transform:none}
+.avatar-preset-grid{grid-template-columns:repeat(6,1fr);gap:12px}.avatar-preset{border-width:3px;background:#e9e9ee;box-shadow:none}.avatar-preset.selected{box-shadow:0 0 0 3px var(--accent-light)}
+.btn-save-avatar,.btn-save{background:var(--accent);color:var(--accent-contrast);box-shadow:none;border-radius:999px}
+.btn-save-avatar:hover:not(:disabled),.btn-save:hover:not(:disabled){filter:none;transform:none}
+.field input,.modal-confirm-field input{background:var(--input-bg);border:1px solid var(--glass-border);border-radius:999px;padding-inline:18px}
+.field .username-wrap input{padding-left:38px}
+.field .username-at{left:19px}
+.field input:focus,.modal-confirm-field input:focus{background:var(--input-bg);box-shadow:0 0 0 3px var(--accent-light)}
+body.dark-mode .field input,body.dark-mode .modal-confirm-field input{background:var(--input-bg)!important;border-color:var(--glass-border)!important}
+body.dark-mode .field input:focus,body.dark-mode .modal-confirm-field input:focus{background:var(--input-bg)!important;border-color:var(--accent)!important}
+.session-item{border-radius:var(--r4);background:var(--input-bg);border-color:var(--glass-border)}
+.modal-bg{background:rgba(0,0,0,.45);backdrop-filter:blur(8px)}.modal-panel{box-shadow:none;background:var(--glass);border-radius:var(--r2)}
+.btn-glass{box-shadow:none;background:var(--bg-grad)}
+.btn,.btn-danger,.btn-danger-solid{border-radius:999px!important}
+@media(max-width:520px){.avatar-preset-grid{grid-template-columns:repeat(3,1fr)}.avatar-current-row{align-items:flex-start}.danger-row{align-items:flex-start;flex-direction:column}.danger-row .btn-danger,.danger-row .btn-danger-solid{width:100%;height:42px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="nav-back" onclick="window.location.href='index.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </button>
+  <div class="nav-title">Account beheren</div>
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="main">
+
+  <!-- 1. PROFIELFOTO -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m4 18 5-5 3 3 2-2 6 5"/></svg></div>
+      <div class="section-card-title">Profielfoto</div>
+    </div>
+    <div class="section-card-body">
+      <!-- Huidige foto -->
+      <div class="avatar-current-row">
+        <div class="avatar-big" id="avatarBig">
+          <div class="avatar-big-emoji" id="avatarBigContent">…</div>
+        </div>
+        <div class="avatar-big-info">
+          <h3>Kies een profielfoto</h3>
+          <p>Kies een van de beschikbare foto's hieronder. De foto wordt direct bijgewerkt op je profiel.</p>
+        </div>
+      </div>
+
+      <!-- Preset galerij -->
+      <div class="avatar-grid-label">Nieuwe avatars</div>
+      <div class="avatar-preset-grid" id="avatarGrid"></div>
+      <details class="avatar-classic" id="classicAvatars">
+        <summary>
+          <span>Klassiek</span>
+          <svg class="avatar-classic-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7 9 5 5 5-5"/></svg>
+        </summary>
+        <div class="avatar-preset-grid" id="avatarClassicGrid"></div>
+      </details>
+
+      <button class="btn-save-avatar" id="btnSaveAvatar" onclick="saveAvatar()" disabled>
+        Foto opslaan
+      </button>
+    </div>
+  </div>
+
+  <!-- 2. PROFIEL -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><path d="m4 16-.8 4.8L8 20l11-11-4-4L4 16Z"/><path d="m13.5 6.5 4 4"/></svg></div>
+      <div class="section-card-title">Profielgegevens</div>
+    </div>
+    <div class="section-card-body">
+      <div class="field">
+        <label>Weergavenaam</label>
+        <input type="text" id="editDisplayName" placeholder="Jouw naam" maxlength="40" oninput="markDirty('profile')">
+        <div class="field-error" id="err-display"></div>
+      </div>
+      <div class="field">
+        <label>Gebruikersnaam</label>
+        <div class="username-wrap">
+          <span class="username-at">@</span>
+          <input type="text" id="editUsername" placeholder="gebruikersnaam" maxlength="20" autocapitalize="none" oninput="validateUsernameEdit()">
+        </div>
+        <div class="field-error" id="err-username"></div>
+      </div>
+      <div class="field">
+        <label>Geboortedatum</label>
+        <input type="date" id="editBirthDate" oninput="markDirty('profile')">
+        <div class="field-hint">Je geboortedatum wordt veilig bij je account opgeslagen.</div>
+        <div class="field-error" id="err-birth-date"></div>
+      </div>
+      <button class="btn-save" id="btnSaveProfile" onclick="saveProfile()" disabled>Opslaan</button>
+    </div>
+  </div>
+
+  <!-- 3. E-MAIL -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/></svg></div>
+      <div class="section-card-title">E-mailadres</div>
+    </div>
+    <div class="section-card-body">
+      <div class="field">
+        <label>E-mailadres</label>
+        <input type="text" id="editEmail" placeholder="naam@example.com" autocapitalize="none" oninput="markDirty('email')">
+        <div class="field-hint">Je ontvangt een bevestigingsmail op het nieuwe adres.</div>
+        <div class="field-error" id="err-email"></div>
+      </div>
+      <button class="btn-save" id="btnSaveEmail" onclick="saveEmail()" disabled>E-mail bijwerken</button>
+    </div>
+  </div>
+
+  <!-- 4. WACHTWOORD -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="m11 12 8-8m-3 3 3 3m-6 0 3 3"/></svg></div>
+      <div class="section-card-title">Wachtwoord wijzigen</div>
+    </div>
+    <div class="section-card-body">
+      <div class="field">
+        <label>Huidig wachtwoord</label>
+        <div class="pw-wrap">
+          <input type="password" id="pwCurrent" placeholder="Huidig wachtwoord" autocomplete="current-password" oninput="checkPwReady()">
+          <button class="pw-toggle" onclick="togglePw('pwCurrent',this)" type="button" tabindex="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="err-pw-current"></div>
+      </div>
+      <div class="field">
+        <label>Nieuw wachtwoord</label>
+        <div class="pw-wrap">
+          <input type="password" id="pwNew" placeholder="Min. 8 tekens" autocomplete="new-password" oninput="checkPwStrength()">
+          <button class="pw-toggle" onclick="togglePw('pwNew',this)" type="button" tabindex="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="pw-strength">
+          <div class="pw-bar" id="nb1"></div><div class="pw-bar" id="nb2"></div>
+          <div class="pw-bar" id="nb3"></div><div class="pw-bar" id="nb4"></div>
+        </div>
+        <div class="pw-label" id="pwStrLabel"></div>
+        <div class="field-hint">Speciale tekens, zoals - _ = + / ( ) * &amp;, zijn toegestaan.</div>
+        <div class="field-error" id="err-pw-new"></div>
+      </div>
+      <div class="field">
+        <label>Herhaal nieuw wachtwoord</label>
+        <div class="pw-wrap">
+          <input type="password" id="pwConfirm" placeholder="Zelfde wachtwoord" autocomplete="new-password" oninput="checkPwMatch()">
+          <button class="pw-toggle" onclick="togglePw('pwConfirm',this)" type="button" tabindex="-1">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+        <div class="field-error" id="err-pw-confirm"></div>
+      </div>
+      <button class="btn-save" id="btnSavePw" onclick="savePassword()" disabled>Wachtwoord wijzigen</button>
+    </div>
+  </div>
+
+  <!-- 5. APPARATEN -->
+  <div class="section-card">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="3"/><path d="M10 18h4"/></svg></div>
+      <div class="section-card-title">Ingelogde apparaten</div>
+    </div>
+    <div class="section-card-body">
+      <div id="sessionArea"></div>
+      <button class="btn-danger" style="margin-top:14px;width:100%;height:40px;border-radius:var(--r3);" onclick="showRevokeModal()">
+        Alle andere sessies beëindigen
+      </button>
+    </div>
+  </div>
+
+  <!-- 6. GEVAARZONE -->
+  <div class="section-card danger-section">
+    <div class="section-card-header">
+      <div class="section-card-icon"><svg viewBox="0 0 24 24"><path d="M12 3 2 21h20L12 3Z"/><path d="M12 9v5m0 3v.01"/></svg></div>
+      <div class="section-card-title" style="color:var(--red)">Gevarenzone</div>
+    </div>
+    <div class="section-card-body">
+      <div class="danger-row">
+        <div class="danger-row-text">
+          <h4>Uitloggen</h4>
+          <p>Log je uit op dit apparaat.</p>
+        </div>
+        <button class="btn-danger" onclick="doSignOut()">Uitloggen</button>
+      </div>
+      <div class="danger-row">
+        <div class="danger-row-text">
+          <h4>Account verwijderen</h4>
+          <p>Verwijdert je account en alle data permanent. Dit kan niet ongedaan worden gemaakt.</p>
+        </div>
+        <button class="btn-danger-solid" onclick="showDeleteModal()">Verwijderen</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Revoke modal -->
+<div class="modal-bg" id="revokeModal" style="display:none">
+  <div class="modal-panel">
+    <div class="modal-title">Andere sessies beëindigen?</div>
+    <div class="modal-desc">Je blijft ingelogd op dit apparaat, maar op alle andere apparaten wordt je uitgelogd.</div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal('revokeModal')">Annuleren</button>
+      <button class="btn btn-red" id="revokeBtn" onclick="revokeOtherSessions()">Beëindigen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete modal -->
+<div class="modal-bg" id="deleteModal" style="display:none">
+  <div class="modal-panel">
+    <div class="modal-title">Account verwijderen?</div>
+    <div class="modal-desc">Dit is onomkeerbaar. Al je sets, gegevens en synchronisaties worden permanent verwijderd. Typ <strong>VERWIJDER</strong> om te bevestigen.</div>
+    <div class="modal-confirm-field">
+      <input type="text" id="deleteInput" placeholder="VERWIJDER" autocapitalize="characters" oninput="checkDelete()">
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeModal('deleteModal')">Annuleren</button>
+      <button class="btn btn-red" id="deleteBtn" onclick="deleteAccount()" disabled>Definitief verwijderen</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js?v=20260817-54"></script>
+<script>
+const AVATARS = VeliosAuth.AVATAR_OPTIONS;
+
+const PW_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,64}$/;
+
+let profile = null;
+let currentUser = null;
+let selectedAvatarIdx = null;   // index in AVATARS, or null if unchanged
+let dirtyFields = { profile: false, email: false, pw: false };
+let unCheckTimer = null;
+let unCheckOk = false;
+let toastTimer;
+
+/* ── INIT ── */
+(async () => {
+  applyTheme();
+  const session = await VeliosAuth.requireAuth('login.html');
+  if (!session) return;
+
+  const { data } = await VeliosAuth.client.auth.getUser();
+  currentUser = data?.user;
+  if (!currentUser) { window.location.href = 'login.html'; return; }
+
+  profile = await VeliosAuth.getProfile();
+  if (!profile) { window.location.href = 'login.html'; return; }
+
+  populateFields();
+  renderAvatarGrid();
+  renderCurrentAvatar();
+  renderSession();
+})();
+
+function applyTheme() {
+  const s = JSON.parse(localStorage.getItem('sd_theme') || '{}');
+  const dark = s.followSystem !== false ? window.matchMedia('(prefers-color-scheme: dark)').matches : !!s.darkMode;
+  if (dark) { document.body.classList.add('dark-mode'); document.getElementById('theme-meta').content = '#000000'; }
+  setAccentCss(s.accentColor==='#0062ff'&&!s.accentWasChosen?'#ff9f0a':(s.accentColor||'#ff9f0a'));
+}
+function setAccentCss(color) {
+  const h = color.replace('#','');
+  const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+  const R=document.documentElement.style;
+  R.setProperty('--accent',color);
+  R.setProperty('--accent2',`rgb(${Math.max(0,r-20)},${Math.max(0,g-20)},${Math.max(0,b-20)})`);
+  R.setProperty('--accent-light',`rgba(${r},${g},${b},0.12)`);
+  R.setProperty('--accent-contrast','#fff');
+}
+
+/* ── POPULATE FIELDS ── */
+function populateFields() {
+  document.getElementById('editDisplayName').value = profile.display_name || '';
+  document.getElementById('editUsername').value = profile.username || '';
+  document.getElementById('editBirthDate').value = String(profile.birth_date || currentUser.user_metadata?.birth_date || '').slice(0,10);
+  document.getElementById('editEmail').value = currentUser.email || '';
+}
+
+/* ── CURRENT AVATAR DISPLAY ── */
+function renderCurrentAvatar() {
+  const el = document.getElementById('avatarBigContent');
+  const bigWrap = document.getElementById('avatarBig');
+  const stored = VeliosAuth.resolveAvatarUrl(profile.avatar_url);
+  const initial = (profile.display_name?.[0] || profile.username?.[0] || '?').toUpperCase();
+  el.innerHTML = '';
+  bigWrap.style.background = 'var(--accent)';
+  if (!stored) { el.textContent = initial; return; }
+  const img = document.createElement('img');
+  img.src = stored; img.alt = 'Profielfoto';
+  img.addEventListener('error', () => { el.innerHTML=''; el.textContent=initial; });
+  el.appendChild(img);
+}
+
+function avatarDataUrl(idx) {
+  return AVATARS[idx]?.url || '';
+}
+
+/* ── AVATAR GRID ── */
+function renderAvatarGrid() {
+  const currentUrl = VeliosAuth.resolveAvatarUrl(profile.avatar_url);
+  const grid = document.getElementById('avatarGrid');
+  const classicGrid = document.getElementById('avatarClassicGrid');
+  const renderAvatars = (group) => AVATARS.map((av, i) => ({ av, i }))
+    .filter(({ av }) => av.group === group)
+    .map(({ av, i }) => {
+    const isSelected = currentUrl === avatarDataUrl(i);
+    return `<button type="button" class="avatar-preset${isSelected ? ' selected' : ''}"
+      data-avatar-index="${i}"
+      onclick="selectAvatar(${i})"
+      title="${av.label}" aria-label="${av.label}" aria-pressed="${isSelected}">
+      <img src="${av.url}" alt="${av.label}">
+    </button>`;
+  }).join('');
+  grid.innerHTML = renderAvatars('study');
+  classicGrid.innerHTML = renderAvatars('classic');
+}
+
+function selectAvatar(idx) {
+  selectedAvatarIdx = idx;
+  // Update grid selection
+  document.querySelectorAll('.avatar-preset').forEach(el => {
+    const isSelected = Number(el.dataset.avatarIndex) === idx;
+    el.classList.toggle('selected', isSelected);
+    el.setAttribute('aria-pressed', String(isSelected));
+  });
+  // Preview in big display
+  const av = AVATARS[idx];
+  const el = document.getElementById('avatarBigContent');
+  el.innerHTML = `<img src="${av.url}" alt="${av.label}">`;
+  // Enable save
+  document.getElementById('btnSaveAvatar').disabled = false;
+}
+
+async function saveAvatar() {
+  if (selectedAvatarIdx === null) return;
+  const btn = document.getElementById('btnSaveAvatar');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> Opslaan…';
+
+  try {
+    const newUrl = avatarDataUrl(selectedAvatarIdx);
+
+    // Werk eerst auth-metadata bij. Sommige Supabase-projecten synchroniseren
+    // auth.users via een trigger terug naar public.profiles; als dit ná de
+    // profielupdate gebeurt kan zo'n trigger de gekozen avatar weer vervangen.
+    const metadata = { ...(currentUser.user_metadata || {}), avatar_url: newUrl };
+    const { data: authResult, error: metadataError } = await VeliosAuth.client.auth.updateUser({ data: metadata });
+    if (metadataError) console.warn('Accountmetadata kon niet worden bijgewerkt:', metadataError.message);
+    if (authResult?.user) currentUser = authResult.user;
+
+    // Schrijf de profielwaarde als laatste, zodat dit altijd de definitieve bron is.
+    const { data: savedProfile, error } = await VeliosAuth.client.from('profiles')
+      .update({ avatar_url: newUrl })
+      .eq('id', currentUser.id)
+      .select('avatar_url')
+      .maybeSingle();
+    if (error) throw error;
+    if (!savedProfile) throw new Error('Je profiel kon niet worden gevonden.');
+    if (VeliosAuth.resolveAvatarUrl(savedProfile?.avatar_url) !== newUrl) {
+      throw new Error('De nieuwe profielfoto is niet bevestigd door de server.');
+    }
+
+    // Lees na beide updates opnieuw terug. Hierdoor tonen we nooit ten onrechte
+    // een succesmelding wanneer een trigger of policy de waarde heeft veranderd.
+    const refreshedProfile = await VeliosAuth.getProfile();
+    if (VeliosAuth.resolveAvatarUrl(refreshedProfile?.avatar_url) !== newUrl) {
+      throw new Error('Supabase geeft na het opslaan nog de vorige profielfoto terug.');
+    }
+
+    currentUser.user_metadata = { ...(currentUser.user_metadata || {}), avatar_url: newUrl };
+    profile = refreshedProfile;
+    selectedAvatarIdx = null;
+    renderCurrentAvatar();
+    renderAvatarGrid();
+    localStorage.setItem('sd_profile_updated_at', String(Date.now()));
+    showToast('Profielfoto bijgewerkt', 'ok');
+    btn.disabled = true;
+  } catch (e) {
+    showToast('Opslaan mislukt: ' + e.message, 'err');
+    btn.disabled = false;
+  }
+  btn.innerHTML = 'Foto opslaan';
+}
+
+/* ── Also update renderHeader in login / nav to decode preset: format ──
+   Add this helper to supabase-client.js or inline wherever avatars are shown: */
+// window.VeliosAvatarData = { AVATARS, avatarDataUrl };  // exposed below
+
+/* ── PROFILE SAVE ── */
+async function validateUsernameEdit() {
+  const raw = document.getElementById('editUsername').value;
+  const v = raw.toLowerCase().replace(/[^a-z0-9_.]/g,'');
+  if (raw !== v) document.getElementById('editUsername').value = v;
+  markDirty('profile');
+  setErr('err-username','');
+  document.getElementById('editUsername').classList.remove('ok','error');
+  if (v === profile.username) { unCheckOk = true; return; }
+  if (v.length < 3) { setErr('err-username','Min. 3 tekens'); unCheckOk = false; return; }
+  if (!/^[a-z][a-z0-9_.]*$/.test(v)) { setErr('err-username','Moet beginnen met een letter'); unCheckOk = false; return; }
+  clearTimeout(unCheckTimer);
+  unCheckTimer = setTimeout(async () => {
+    const exists = await VeliosAuth.usernameExists(v);
+    if (exists) {
+      setErr('err-username','Gebruikersnaam al in gebruik');
+      document.getElementById('editUsername').classList.add('error');
+      unCheckOk = false;
+    } else {
+      document.getElementById('editUsername').classList.add('ok');
+      unCheckOk = true;
+    }
+  }, 500);
+}
+
+function markDirty(section) {
+  dirtyFields[section] = true;
+  if (section === 'profile') document.getElementById('btnSaveProfile').disabled = false;
+  if (section === 'email') document.getElementById('btnSaveEmail').disabled = false;
+}
+
+async function saveProfile() {
+  const displayName = document.getElementById('editDisplayName').value.trim();
+  const username = document.getElementById('editUsername').value.trim().toLowerCase();
+  const birthDate = document.getElementById('editBirthDate').value;
+  setErr('err-display',''); setErr('err-username',''); setErr('err-birth-date','');
+  if (!displayName) { setErr('err-display','Vul een weergavenaam in'); return; }
+  if (username.length < 3) { setErr('err-username','Min. 3 tekens'); return; }
+  if (!unCheckOk && username !== profile.username) { setErr('err-username','Controleer gebruikersnaam'); return; }
+  if (!birthDate) { setErr('err-birth-date','Vul je geboortedatum in'); return; }
+  const birth = new Date(birthDate + 'T12:00:00');
+  const oldest = new Date(); oldest.setFullYear(oldest.getFullYear()-120);
+  if (Number.isNaN(birth.getTime()) || birth > new Date() || birth < oldest) { setErr('err-birth-date','Controleer deze geboortedatum'); return; }
+  const btn = document.getElementById('btnSaveProfile');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Opslaan…';
+  try {
+    const { error } = await VeliosAuth.client.from('profiles')
+      .update({ display_name: displayName, username })
+      .eq('id', currentUser.id);
+    if (error) throw error;
+    const metadata={...(currentUser.user_metadata||{}),username,display_name:displayName,birth_date:birthDate};
+    const { error: metadataError } = await VeliosAuth.client.auth.updateUser({data:metadata});
+    if(metadataError)throw metadataError;
+    currentUser.user_metadata=metadata;
+    profile.display_name = displayName; profile.username = username; profile.birth_date=birthDate;
+    showToast('Profiel opgeslagen', 'ok');
+    dirtyFields.profile = false; btn.disabled = false;
+  } catch (e) { showToast('Opslaan mislukt: ' + e.message, 'err'); btn.disabled = false; }
+  btn.textContent = 'Opslaan';
+}
+
+async function saveEmail() {
+  const email = document.getElementById('editEmail').value.trim().toLowerCase();
+  setErr('err-email','');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setErr('err-email','Ongeldig e-mailadres'); return; }
+  if (email === currentUser.email) { setErr('err-email','Dit is al je huidige e-mailadres'); return; }
+  const btn = document.getElementById('btnSaveEmail');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Bijwerken…';
+  try {
+    const { error } = await VeliosAuth.client.auth.updateUser({ email });
+    if (error) throw error;
+    showToast('Bevestigingsmail verstuurd naar ' + email, 'ok');
+    dirtyFields.email = false;
+  } catch (e) { showToast('Mislukt: ' + e.message, 'err'); }
+  btn.disabled = false; btn.textContent = 'E-mail bijwerken';
+}
+
+/* ── PASSWORD ── */
+function checkPwStrength() {
+  const v = document.getElementById('pwNew').value;
+  const bars = ['nb1','nb2','nb3','nb4'].map(id => document.getElementById(id));
+  const label = document.getElementById('pwStrLabel');
+  bars.forEach(b => b.className = 'pw-bar');
+  if (!v) { label.textContent = ''; checkPwReady(); return; }
+  let score = 0;
+  if (v.length >= 8) score++;
+  if (/[A-Z]/.test(v) && /[a-z]/.test(v)) score++;
+  if (/\d/.test(v)) score++;
+  if (v.length >= 14) score++;
+  const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+  const labels = ['','Zwak','Redelijk','Goed','Sterk'];
+  for (let i = 0; i < score; i++) bars[i].classList.add(cls);
+  label.textContent = labels[score] || '';
+  label.style.color = cls === 'weak' ? 'var(--red)' : cls === 'medium' ? '#f59e0b' : 'var(--green)';
+  checkPwMatch(); checkPwReady();
+}
+function checkPwMatch() {
+  const p1 = document.getElementById('pwNew').value;
+  const p2 = document.getElementById('pwConfirm').value;
+  if (!p2) { setErr('err-pw-confirm',''); return; }
+  const match = p1 === p2;
+  setErr('err-pw-confirm', match ? '' : 'Wachtwoorden komen niet overeen');
+  document.getElementById('pwConfirm').classList.toggle('ok', match);
+  document.getElementById('pwConfirm').classList.toggle('error', !match);
+  checkPwReady();
+}
+function checkPwReady() {
+  const cur = document.getElementById('pwCurrent').value;
+  const nw = document.getElementById('pwNew').value;
+  const con = document.getElementById('pwConfirm').value;
+  document.getElementById('btnSavePw').disabled = !(cur && PW_REGEX.test(nw) && nw === con);
+}
+async function savePassword() {
+  const cur = document.getElementById('pwCurrent').value;
+  const nw = document.getElementById('pwNew').value;
+  setErr('err-pw-current',''); setErr('err-pw-new','');
+  if (!PW_REGEX.test(nw)) { setErr('err-pw-new','8-64 tekens, hoofdletter, kleine letter en cijfer'); return; }
+  const btn = document.getElementById('btnSavePw');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div> Wijzigen…';
+  try {
+    const { error: signErr } = await VeliosAuth.client.auth.signInWithPassword({ email: currentUser.email, password: cur });
+    if (signErr) { setErr('err-pw-current','Huidig wachtwoord is onjuist'); btn.disabled = false; btn.textContent = 'Wachtwoord wijzigen'; return; }
+    const { error } = await VeliosAuth.client.auth.updateUser({ password: nw });
+    if (error) throw error;
+    showToast('Wachtwoord gewijzigd', 'ok');
+    document.getElementById('pwCurrent').value = '';
+    document.getElementById('pwNew').value = '';
+    document.getElementById('pwConfirm').value = '';
+    ['nb1','nb2','nb3','nb4'].forEach(id => document.getElementById(id).className='pw-bar');
+    document.getElementById('pwStrLabel').textContent = '';
+  } catch (e) { showToast('Mislukt: ' + e.message, 'err'); }
+  btn.disabled = false; btn.textContent = 'Wachtwoord wijzigen';
+}
+
+/* ── SESSION ── */
+function renderSession() {
+  const ua = navigator.userAgent;
+  let device = 'Onbekend apparaat';
+  let iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18.01"/></svg>`;
+  if (/iPad|Tablet/.test(ua)) device = 'Tablet';
+  else if (/iPhone|Android.*Mobile/.test(ua)) device = 'Smartphone';
+  else if (/Mac/.test(ua)) { device = 'Mac'; iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`; }
+  else if (/Win/.test(ua)) { device = 'Windows pc'; iconSvg = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`; }
+  const browser = /Chrome/.test(ua)&&!/Edg/.test(ua) ? 'Chrome' : /Firefox/.test(ua) ? 'Firefox' : /Edg/.test(ua) ? 'Edge' : /Safari/.test(ua) ? 'Safari' : 'Browser';
+  document.getElementById('sessionArea').innerHTML = `
+    <div class="session-item current-session">
+      <div class="session-icon">${iconSvg}</div>
+      <div>
+        <div class="session-name">${device} — ${browser}</div>
+        <div class="session-meta">Dit apparaat · Nu actief</div>
+      </div>
+      <div class="session-badge">Huidig</div>
+    </div>
+    <p style="font-size:11px;color:var(--text3);font-weight:600;margin-top:10px;line-height:1.5;">Gebruik "Alle andere sessies beëindigen" om op andere apparaten uit te loggen.</p>`;
+}
+
+function showRevokeModal() { document.getElementById('revokeModal').style.display = 'flex'; document.body.style.overflow = 'hidden'; }
+async function revokeOtherSessions() {
+  const btn = document.getElementById('revokeBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>';
+  try {
+    await VeliosAuth.client.auth.signOut({ scope: 'others' });
+    closeModal('revokeModal');
+    showToast('Andere sessies beëindigd', 'ok');
+  } catch (e) { showToast('Mislukt: ' + e.message, 'err'); }
+  btn.disabled = false; btn.textContent = 'Beëindigen';
+}
+
+/* ── SIGN OUT / DELETE ── */
+async function doSignOut() {
+  await VeliosAuth.signOut();
+  window.location.href = 'login.html';
+}
+function showDeleteModal() {
+  document.getElementById('deleteInput').value = '';
+  document.getElementById('deleteBtn').disabled = true;
+  document.getElementById('deleteModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function checkDelete() {
+  document.getElementById('deleteBtn').disabled =
+    document.getElementById('deleteInput').value.toUpperCase() !== 'VERWIJDER';
+}
+async function deleteAccount() {
+  const btn = document.getElementById('deleteBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spinner"></div>';
+  try {
+    const { error } = await VeliosAuth.client.rpc('delete_own_account');
+    if (error) throw error;
+    showToast('Account verwijderd. Tot ziens!', 'ok');
+    setTimeout(() => { window.location.href = 'login.html'; }, 1200);
+  } catch (e) {
+    showToast('Verwijderen mislukt: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Definitief verwijderen';
+  }
+}
+
+/* ── UTILS ── */
+function closeModal(id) { document.getElementById(id).style.display = 'none'; document.body.style.overflow = ''; }
+function setErr(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg; el.classList.toggle('show', !!msg);
+}
+function togglePw(inputId, btn) {
+  const inp = document.getElementById(inputId);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  btn.innerHTML = show
+    ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 015.06-5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 01-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`
+    : `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+}
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show'+(type?' '+type:'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.className=''; }, 3500);
+}
+window.addEventListener('beforeunload', e => {
+  if (Object.values(dirtyFields).some(Boolean)) { e.preventDefault(); e.returnValue=''; }
+});
+
+</script>
+</body>
+</html>

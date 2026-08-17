@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<script src="sw-register.js?v=20260817-54"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Velios+">
+<meta id="theme-meta" name="theme-color" content="#f0eef9">
+<title>Velios+ — Gesynchroniseerde sets</title>
+<link rel="icon" href="favicon.svg" media="(prefers-color-scheme: light)">
+<link rel="icon" href="favicon-dark.svg" media="(prefers-color-scheme: dark)">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-grad:linear-gradient(160deg,#f0eef9 0%,#ddd8f0 50%,#cfc8e8 100%);
+  --glass:rgba(255,255,255,0.92);
+  --glass2:rgba(255,255,255,0.80);
+  --glass-border:rgba(200,195,230,0.6);
+  --glass-shadow:0 2px 8px rgba(0,98,255,0.1),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
+  --glass-shadow-lg:0 8px 32px rgba(0,98,255,0.15),inset 1px 1px 0 rgba(255,255,255,1),inset -1px -1px 2px rgba(255,255,255,0.5);
+  --text:#0b0f2a;--text2:#3d3a55;--text3:#7c7899;
+  --accent:#ff9f0a;--accent2:#e47f00;--accent-light:rgba(255,159,10,0.14);--accent-contrast:#fff;
+  --green:#18b672;--red:#e83a4a;--orange:#f07b20;
+  --r:30px;--r2:36px;--r3:34px;--r4:30px;
+  --font:'DM Sans',sans-serif;
+  --ease:cubic-bezier(0,0,.47,1.15);
+  --ease2:cubic-bezier(0.34,1.56,0.64,1);
+  --nav-h:calc(72px + env(safe-area-inset-top,0px));
+}
+html{min-height:100vh;font-family:var(--font);color:var(--text);font-size:16px;overflow-x:hidden;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+body{min-height:100dvh;background:var(--bg-grad);background-attachment:fixed;display:flex;flex-direction:column;-webkit-touch-callout:none;}
+
+body.dark-mode{--bg-grad:linear-gradient(180deg,#0a0812 0%,#10091e 100%);--glass:rgba(22,20,34,0.96);--glass2:rgba(22,20,34,0.85);--glass-border:rgba(64,60,100,0.6);--text:#fff;--text2:#c8c4e0;--text3:rgba(255,255,255,0.45);--glass-shadow:0 2px 10px rgba(0,0,0,0.6),inset 1px 1px 0 rgba(80,75,120,0.5);--glass-shadow-lg:0 8px 32px rgba(0,0,0,0.7),inset 1px 1px 0 rgba(80,75,120,0.5);}
+
+nav{position:sticky;top:0;z-index:200;background:rgba(240,238,249,0.94);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(200,195,230,0.5);padding:env(safe-area-inset-top,0px) 28px 0;height:var(--nav-h);display:flex;align-items:center;gap:16px;transition:background .3s;}
+body.dark-mode nav{background:rgba(10,8,20,0.97)!important;border-color:var(--glass-border)!important;}
+.nav-back{width:40px;height:40px;border-radius:var(--r3);background:var(--glass);border:1px solid var(--glass-border);box-shadow:var(--glass-shadow);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s var(--ease);flex-shrink:0;color:var(--text2);}
+.nav-back:hover{background:#fff;transform:scale(1.08);box-shadow:var(--glass-shadow-lg);}
+.nav-back svg{width:18px;height:18px;}
+.nav-title{font-size:18px;font-weight:800;letter-spacing:-0.4px;color:var(--text);}
+.nav-spacer{flex:1;}
+
+.main{max-width:860px;margin:0 auto;padding:32px 28px 80px;width:100%;}
+@media(max-width:750px){.main{padding:20px 16px 100px;}}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:28px;animation:fadeUp .4s var(--ease2) both;}
+.page-header-inner{display:flex;align-items:center;gap:16px;}
+.page-avatar{width:64px;height:64px;border-radius:18px;background:linear-gradient(180deg,var(--accent) 0%,var(--accent2) 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:800;overflow:hidden;flex-shrink:0;box-shadow:0 4px 16px var(--accent-light);}
+.page-avatar img{width:100%;height:100%;object-fit:cover;}
+.page-header-text h1{font-size:22px;font-weight:800;letter-spacing:-0.5px;color:var(--text);}
+.page-header-text p{font-size:13px;color:var(--text3);font-weight:600;margin-top:2px;}
+
+/* SYNC METER */
+.sync-meter-wrap{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r2);padding:20px 24px;box-shadow:var(--glass-shadow);margin-bottom:24px;animation:fadeUp .4s var(--ease2) .05s both;}
+.sync-meter-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.sync-meter-title{font-size:14px;font-weight:800;color:var(--text);display:flex;align-items:center;gap:7px;}
+.sync-meter-title svg{width:15px;height:15px;color:var(--accent);}
+.sync-count-label{font-size:13px;font-weight:700;color:var(--text3);}
+.sync-count-label span{color:var(--accent);font-size:15px;}
+.sync-track{height:8px;background:rgba(200,195,230,0.4);border-radius:4px;overflow:hidden;}
+.sync-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--accent) 0%,var(--accent2) 100%);transition:width .7s var(--ease2);box-shadow:0 0 8px var(--accent-light);}
+.sync-fill.full{background:linear-gradient(90deg,var(--orange) 0%,var(--red) 100%);}
+.sync-slots{display:flex;gap:5px;margin-top:10px;}
+.sync-slot{flex:1;height:4px;border-radius:2px;background:rgba(200,195,230,0.3);transition:background .3s;}
+.sync-slot.used{background:var(--accent);}
+.sync-slot.used.full{background:var(--red);}
+
+/* SECTION */
+.section{margin-bottom:28px;animation:fadeUp .4s var(--ease2) .1s both;}
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.section-title{font-size:16px;font-weight:800;letter-spacing:-0.2px;color:var(--text);display:flex;align-items:center;gap:8px;}
+.section-title-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);opacity:.8;flex-shrink:0;}
+
+/* SYNCED CARD */
+@keyframes cardIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:none}}
+.synced-grid{display:flex;flex-direction:column;gap:8px;}
+.synced-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:14px 18px;box-shadow:var(--glass-shadow);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;position:relative;overflow:hidden;transition:transform .2s var(--ease),box-shadow .2s var(--ease);}
+.synced-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.65;}
+.synced-card:hover{transform:translateX(4px);box-shadow:var(--glass-shadow-lg);}
+.synced-card-info h3{font-size:14px;font-weight:800;color:var(--text);letter-spacing:-0.2px;margin-bottom:4px;}
+.synced-card-meta{display:flex;gap:5px;flex-wrap:wrap;align-items:center;}
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:700;}
+.badge-purple{background:var(--accent-light);color:var(--accent);}
+.badge-gray{background:rgba(120,110,150,0.14);color:var(--text2);}
+.synced-card-date{font-size:11px;color:var(--text3);font-weight:600;margin-top:3px;}
+.synced-card-actions{display:flex;align-items:center;gap:7px}
+.btn-synced-action{height:34px;padding:0 13px;border-radius:999px;background:#e5e5ea;border:0;color:var(--text);font-family:var(--font);font-size:12px;font-weight:750;cursor:pointer;transition:background .15s,transform .15s;white-space:nowrap;display:flex;align-items:center;gap:5px}
+.btn-synced-action:hover{background:#dadae0;transform:scale(.96)}
+.btn-synced-action.danger{background:rgba(232,58,74,.1);color:var(--red)}
+.btn-synced-action.danger:hover{background:rgba(232,58,74,.17)}
+.btn-synced-action svg{width:13px;height:13px}
+body.dark-mode .btn-synced-action{background:#2c2c2e}
+
+/* LOCAL CARD */
+.local-grid{display:flex;flex-direction:column;gap:8px;}
+.local-card{background:var(--glass);border:1px solid var(--glass-border);border-radius:var(--r);padding:13px 18px;box-shadow:var(--glass-shadow);display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;transition:transform .2s var(--ease),box-shadow .2s var(--ease);}
+.local-card:hover{transform:translateX(3px);box-shadow:var(--glass-shadow-lg);}
+.local-card-info h3{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px;}
+.local-card-meta{font-size:11px;color:var(--text3);font-weight:600;}
+.btn-sync{height:32px;padding:0 12px;border-radius:var(--r4);background:var(--accent-light);border:1px solid rgba(0,98,255,0.2);color:var(--accent);font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;transition:all .15s;white-space:nowrap;display:flex;align-items:center;gap:4px;}
+.btn-sync:hover{background:rgba(0,98,255,0.2);transform:scale(1.04);}
+.btn-sync:disabled{opacity:.4;cursor:not-allowed;transform:none;}
+.btn-sync svg{width:12px;height:12px;}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:36px 20px;color:var(--text3);}
+.empty-icon{font-size:40px;display:block;margin-bottom:10px;}
+.empty-state h3{font-size:15px;font-weight:800;color:var(--text2);margin-bottom:4px;}
+.empty-state p{font-size:13px;font-weight:600;}
+
+/* LIMIT NOTICE */
+.limit-notice{font-size:12px;color:var(--text3);font-weight:600;text-align:center;padding:10px;background:rgba(240,123,32,0.06);border:1px solid rgba(240,123,32,0.2);border-radius:var(--r4);margin-top:8px;}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;z-index:2000;background:rgba(140,130,185,0.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;}
+.modal-panel{background:rgba(255,255,255,0.99);border:1.5px solid var(--glass-border);border-radius:var(--r2);padding:26px;width:90%;max-width:400px;box-shadow:0 16px 64px rgba(80,60,160,0.22);animation:fadeUp .3s var(--ease2) both;}
+body.dark-mode .modal-panel{background:rgb(16,14,26)!important;border-color:var(--glass-border)!important;}
+.modal-title{font-size:17px;font-weight:800;letter-spacing:-0.3px;margin-bottom:7px;color:var(--text);}
+.modal-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:18px;}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;}
+.btn{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:var(--r3);cursor:pointer;font-family:var(--font);font-size:14px;font-weight:700;padding:9px 18px;transition:all .2s var(--ease);outline:none;}
+.btn-glass{background:var(--glass);color:var(--text);box-shadow:var(--glass-shadow);border:1px solid var(--glass-border);}
+.btn-glass:hover{background:rgba(255,255,255,.95);transform:scale(1.03);}
+.btn-danger{background:rgba(232,58,74,0.1);color:var(--red);border:1px solid rgba(232,58,74,0.25);}
+.btn-danger:hover{background:rgba(232,58,74,0.18);}
+.btn-danger:disabled{opacity:.5;cursor:not-allowed;}
+
+/* SKELETON */
+.skeleton{background:linear-gradient(90deg,rgba(200,195,230,0.3) 25%,rgba(200,195,230,0.5) 50%,rgba(200,195,230,0.3) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:var(--r);}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spinner{width:14px;height:14px;border:2px solid rgba(0,98,255,0.2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:rgba(252,250,255,.99);border:1px solid rgba(200,195,230,.7);border-radius:var(--r);padding:12px 20px;font-size:14px;font-weight:700;box-shadow:0 8px 32px rgba(80,60,160,.2);opacity:0;transform:translateY(12px);pointer-events:none;transition:all .25s var(--ease2);}
+#toast.show{opacity:1;transform:translateY(0);}
+#toast.ok{background:#f0fdf8;border-color:rgba(24,182,114,.3);color:var(--green);}
+#toast.err{background:#fff0f1;border-color:rgba(232,58,74,.3);color:var(--red);}
+@media(max-width:750px){#toast{bottom:calc(env(safe-area-inset-bottom,0px)+16px);left:16px;right:16px;text-align:center;}}
+
+/* Vernieuwde, vlakke synchronisatiestijl */
+:root{--bg-grad:#f2f2f7;--glass:#fff;--glass2:#fff;--glass-border:#dedee5;--glass-shadow:none;--glass-shadow-lg:none;--text:#0b1029;--text2:#45465a;--text3:#77798b;--r:30px;--r2:36px;--r3:34px;--r4:30px}
+body.dark-mode{--bg-grad:#000;--glass:#1c1c1e;--glass2:#1c1c1e;--glass-border:#343438;--text:#fff;--text2:#d0d0d6;--text3:#8e8e93;--glass-shadow:none;--glass-shadow-lg:none}
+nav,body.dark-mode nav{background:var(--bg-grad)!important;border-color:var(--glass-border)!important;backdrop-filter:none;-webkit-backdrop-filter:none}
+.nav-back{background:var(--glass);box-shadow:none;border-radius:50%}.nav-back:hover{background:var(--glass);box-shadow:none;transform:none}
+.page-header{animation:none}.page-avatar{border-radius:50%;background:var(--accent);box-shadow:none}.page-avatar img{border-radius:50%}
+.sync-meter-wrap,.synced-card,.local-card{box-shadow:none;border-radius:var(--r2);animation:none}.synced-card::before{display:none}
+.synced-card:hover,.local-card:hover{transform:none;box-shadow:none}.sync-fill{background:var(--accent);box-shadow:none}.sync-fill.full{background:var(--red)}
+.badge{border-radius:999px}.btn-sync{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}.btn-sync:hover{background:var(--accent);transform:none}
+.btn,.btn-sync,.btn-unsync{border-radius:999px!important}
+.empty-icon{width:48px;height:48px;border-radius:50%;background:var(--accent-light);color:var(--accent);display:grid;place-items:center;margin:0 auto 12px}.empty-icon svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.modal-bg{background:rgba(0,0,0,.45);backdrop-filter:blur(8px)}.modal-panel{box-shadow:none;background:var(--glass);border-radius:var(--r2)}.btn-glass{box-shadow:none;background:var(--bg-grad)}
+@media(max-width:560px){.synced-card,.local-card{grid-template-columns:1fr}.synced-card-actions{width:100%}.btn-synced-action,.btn-sync{flex:1;justify-content:center;height:40px}}
+</style>
+</head>
+<body>
+
+<nav>
+  <button class="nav-back" onclick="window.location.href='index.html'">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+  </button>
+  <div class="nav-title">Gesynchroniseerde sets</div>
+  <div class="nav-spacer"></div>
+</nav>
+
+<div class="main">
+
+  <div class="page-header">
+    <div class="page-header-inner">
+      <div class="page-avatar" id="pageAvatar">…</div>
+      <div class="page-header-text">
+        <h1 id="headerName">Laden…</h1>
+        <p id="headerUsername">@—</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sync meter -->
+  <div class="sync-meter-wrap">
+    <div class="sync-meter-header">
+      <div class="sync-meter-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+        Synchronisatie
+      </div>
+      <div class="sync-count-label"><span id="meterCount">0</span>/5 slots gebruikt</div>
+    </div>
+    <div class="sync-track"><div class="sync-fill" id="syncFill" style="width:0%"></div></div>
+    <div class="sync-slots" id="syncSlots"></div>
+  </div>
+
+  <!-- Gesynchroniseerde sets -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-title-dot"></div>
+        Gesynchroniseerde sets
+      </div>
+    </div>
+    <div class="synced-grid" id="syncedGrid">
+      <div class="skeleton" style="height:68px;margin-bottom:4px;"></div>
+      <div class="skeleton" style="height:68px;"></div>
+    </div>
+  </div>
+
+  <!-- Lokale sets -->
+  <div class="section" style="animation-delay:.15s">
+    <div class="section-header">
+      <div class="section-title">
+        <div class="section-title-dot" style="background:var(--orange)"></div>
+        Lokale sets
+      </div>
+    </div>
+    <p style="font-size:13px;color:var(--text3);font-weight:600;margin-bottom:12px;">Al je zelfgemaakte sets. Synchroniseer ze om ze op al je apparaten te gebruiken (max. 5).</p>
+    <div class="local-grid" id="localGrid">
+      <div class="skeleton" style="height:60px;margin-bottom:4px;"></div>
+      <div class="skeleton" style="height:60px;"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Desync modal -->
+<div class="modal-bg" id="desyncModal" style="display:none">
+  <div class="modal-panel">
+    <div class="modal-title">Set desynchroniseren?</div>
+    <div class="modal-desc" id="desyncDesc">Deze set wordt niet meer gesynchroniseerd tussen je apparaten. Je lokale kopie blijft beschikbaar.</div>
+    <div class="modal-footer">
+      <button class="btn btn-glass" onclick="closeDesyncModal()">Annuleren</button>
+      <button class="btn btn-danger" id="desyncConfirmBtn" onclick="confirmDesync()">Desynchroniseren</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js?v=20260817-54"></script>
+<script>
+let profile = null;
+let syncedSets = [];
+let localSets = [];
+let pendingDesyncId = null;
+let toastTimer;
+
+/* ── INIT ── */
+(async () => {
+  applyTheme();
+  const session = await VeliosAuth.requireAuth('login.html');
+  if (!session) return;
+
+  profile = await VeliosAuth.getProfile();
+  if (!profile) { window.location.href = 'login.html'; return; }
+
+  renderHeader();
+  await loadData();
+})();
+
+function applyTheme() {
+  const s = JSON.parse(localStorage.getItem('sd_theme') || '{}');
+  const dark = s.followSystem !== false ? window.matchMedia('(prefers-color-scheme: dark)').matches : !!s.darkMode;
+  if (dark) { document.body.classList.add('dark-mode'); document.getElementById('theme-meta').content = '#000000'; }
+  setAccentCss(s.accentColor==='#0062ff'&&!s.accentWasChosen?'#ff9f0a':(s.accentColor||'#ff9f0a'));
+}
+function setAccentCss(color) {
+  const h = color.replace('#','');
+  const r=parseInt(h.substr(0,2),16),g=parseInt(h.substr(2,2),16),b=parseInt(h.substr(4,2),16);
+  const R=document.documentElement.style;
+  R.setProperty('--accent',color);
+  R.setProperty('--accent2',`rgb(${Math.max(0,r-20)},${Math.max(0,g-20)},${Math.max(0,b-20)})`);
+  R.setProperty('--accent-light',`rgba(${r},${g},${b},0.12)`);
+  R.setProperty('--accent-contrast','#fff');
+}
+
+function renderHeader() {
+  const initial = (profile.display_name?.[0] || profile.username?.[0] || '?').toUpperCase();
+  const av = document.getElementById('pageAvatar');
+  const avatarUrl = VeliosAuth.resolveAvatarUrl(profile.avatar_url);
+  if (avatarUrl) {
+    av.innerHTML = `<img src="${esc(avatarUrl)}" alt="Profielfoto">`;
+  } else {
+    av.textContent = initial;
+  }
+  document.getElementById('headerName').textContent = profile.display_name || profile.username || '—';
+  document.getElementById('headerUsername').textContent = '@' + (profile.username || '—');
+}
+
+let profileHeaderRefresh = null;
+async function refreshProfileHeader() {
+  if (!profile || profileHeaderRefresh || !navigator.onLine) return profileHeaderRefresh;
+  profileHeaderRefresh = (async () => {
+    try {
+      const latestProfile = await VeliosAuth.getProfile();
+      if (latestProfile) {
+        profile = latestProfile;
+        renderHeader();
+      }
+    } catch (error) {
+      console.warn('Profielkop kon niet worden vernieuwd:', error.message);
+    }
+  })();
+  try { await profileHeaderRefresh; }
+  finally { profileHeaderRefresh = null; }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshProfileHeader();
+});
+window.addEventListener('focus', refreshProfileHeader);
+window.addEventListener('storage', event => {
+  if (event.key === 'sd_profile_updated_at') refreshProfileHeader();
+});
+setInterval(() => {
+  if (document.visibilityState === 'visible') refreshProfileHeader();
+}, 15000);
+
+/* ── LOAD ALL DATA ── */
+async function loadData() {
+  const [syncedRaw, count] = await Promise.all([
+    VeliosAuth.getSyncedSets(),
+    VeliosAuth.getSyncCount(),
+  ]);
+  syncedSets = syncedRaw;
+  localSets = getLocalSets();
+
+  updateSyncMeter(count);
+  renderSyncedSets();
+  renderLocalSets(count);
+}
+
+/* ── GET LOCAL SETS from sd_sets ── */
+function getLocalSets() {
+  try {
+    const raw = localStorage.getItem('sd_sets');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(set => !set.fromServer && !set._serverFile && !set._cloud);
+  } catch { return []; }
+}
+
+/* ── SYNC METER ── */
+function updateSyncMeter(count) {
+  document.getElementById('meterCount').textContent = count;
+  const pct = (count / 5) * 100;
+  const fill = document.getElementById('syncFill');
+  fill.style.width = pct + '%';
+  fill.className = 'sync-fill' + (count >= 5 ? ' full' : '');
+  document.getElementById('syncSlots').innerHTML = Array.from({length:5}, (_,i) =>
+    `<div class="sync-slot${i < count ? ' used'+(count>=5?' full':'') : ''}"></div>`
+  ).join('');
+}
+
+/* ── SYNCED SETS ── */
+function renderSyncedSets() {
+  const grid = document.getElementById('syncedGrid');
+  if (!syncedSets.length) {
+    grid.innerHTML = `<div class="empty-state">
+      <span class="empty-icon"><svg viewBox="0 0 24 24"><path d="M6.5 18.5h10a4.5 4.5 0 0 0 .58-8.96A6 6 0 0 0 5.56 8.1 4.25 4.25 0 0 0 6.5 18.5Z"/></svg></span>
+      <h3>Geen gesynchroniseerde sets</h3>
+      <p>Synchroniseer hieronder een lokale set.</p>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = syncedSets.map((item, i) => {
+    const set = item.sets || {};
+    const setData = typeof set.data === 'string' ? (()=>{try{return JSON.parse(set.data)}catch(e){return []}})() : set.data;
+    const terms = Array.isArray(setData) ? setData.length : Array.isArray(setData?.terms) ? setData.terms.length : 0;
+    const dateSource = setData?.datum || set.updated_at || set.created_at || item.synced_at;
+    const date = (String(dateSource||'').match(/^\d{4}-\d{2}-\d{2}/)||[''])[0];
+    return `<div class="synced-card" style="animation:cardIn .35s var(--ease2) ${i*50}ms both">
+      <div class="synced-card-info">
+        <h3>${esc(set.naam || 'Naamloze set')}</h3>
+        <div class="synced-card-meta">
+          ${set.vak ? `<span class="badge badge-purple">${esc(set.vak)}</span>` : ''}
+          <span class="badge badge-gray">${terms} term${terms!==1?'en':''}</span>
+        </div>
+        ${date?`<div class="synced-card-date">${date}</div>`:''}
+      </div>
+      <div class="synced-card-actions">
+        <button class="btn-synced-action" onclick="window.location.href='index.html?editCloud=${encodeURIComponent(item.set_id)}'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4Z"/></svg>
+          Bewerken
+        </button>
+        <button class="btn-synced-action danger" onclick="window.location.href='index.html?deleteCloud=${encodeURIComponent(item.set_id)}'">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/></svg>
+          Verwijderen
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── LOCAL SETS ── */
+function renderLocalSets(syncCount) {
+  const grid = document.getElementById('localGrid');
+  const limitReached = syncCount >= 5;
+
+  if (!localSets.length) {
+    grid.innerHTML = `<div class="empty-state" style="padding:24px 20px">
+      <span class="empty-icon"><svg viewBox="0 0 24 24"><path d="M4 5h16v14H4z"/><path d="m4 7 8 6 8-6"/></svg></span>
+      <h3>Geen lokale sets gevonden</h3>
+      <p>Maak eerst sets aan in Velios+.</p>
+    </div>`;
+    return;
+  }
+
+  const syncedKeys = new Set(syncedSets.map(item => {
+    const set=item.sets||{};
+    return `${String(set.naam||'').trim().toLowerCase()}|${String(set.vak||'').trim().toLowerCase()}`;
+  }));
+
+  grid.innerHTML = localSets.map((set, i) => {
+    const terms = Array.isArray(set.terms) ? set.terms.length : 0;
+    const title = set.title || set.naam || 'Naamloze set';
+    const alreadySynced = syncedKeys.has(`${title.trim().toLowerCase()}|${String(set.vak||'').trim().toLowerCase()}`);
+    const disabled = limitReached || alreadySynced;
+
+    return `<div class="local-card" style="animation:cardIn .35s var(--ease2) ${i*40}ms both">
+      <div class="local-card-info">
+        <h3>${esc(title)}</h3>
+        <div class="local-card-meta">
+          ${set.vak ? esc(set.vak) + ' · ' : ''}${terms} term${terms!==1?'en':''} · Lokaal
+          ${alreadySynced ? ' · <span style="color:var(--green);font-weight:700;">Al gesynchroniseerd</span>' : ''}
+        </div>
+      </div>
+      ${alreadySynced
+        ? `<span class="badge badge-purple" style="flex-shrink:0">Gesynchroniseerd</span>`
+        : `<button class="btn-sync" ${disabled?'disabled':''} onclick="doSync('${set.id}',this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+            ${limitReached ? 'Limiet bereikt' : 'Synchroniseer'}
+          </button>`
+      }
+    </div>`;
+  }).join('');
+
+  if (limitReached) {
+    grid.insertAdjacentHTML('beforeend', `<div class="limit-notice">
+      Je hebt het maximum van 5 gesynchroniseerde sets bereikt. Desynchroniseer een set hierboven om ruimte te maken.
+    </div>`);
+  }
+}
+
+/* ── DO SYNC ── */
+async function doSync(localId, btn) {
+  if (btn.disabled) return;
+  const set = localSets.find(s => s.id === localId);
+  if (!set) { showToast('Set niet gevonden', 'err'); return; }
+
+  const origHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div>';
+
+  try {
+    await VeliosAuth.syncLocalSet(set);
+    showToast('Set gesynchroniseerd', 'ok');
+    await loadData();
+  } catch (e) {
+    const msg = e.message === 'sync_limit_reached'
+      ? 'Maximum van 5 gesynchroniseerde sets bereikt'
+      : 'Synchroniseren mislukt: ' + e.message;
+    showToast(msg, 'err');
+    btn.disabled = false;
+    btn.innerHTML = origHtml;
+  }
+}
+
+/* ── DESYNC ── */
+function askDesync(setId, naam) {
+  pendingDesyncId = setId;
+  document.getElementById('desyncDesc').textContent =
+    `"${naam}" wordt niet meer gesynchroniseerd. Je lokale kopie blijft gewoon beschikbaar.`;
+  document.getElementById('desyncModal').style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+function closeDesyncModal() {
+  document.getElementById('desyncModal').style.display = 'none';
+  document.body.style.overflow = '';
+  pendingDesyncId = null;
+}
+async function confirmDesync() {
+  if (!pendingDesyncId) return;
+  const btn = document.getElementById('desyncConfirmBtn');
+  btn.disabled = true; btn.textContent = '…';
+  try {
+    await VeliosAuth.unsyncSet(pendingDesyncId);
+    closeDesyncModal();
+    showToast('Set gedesynchroniseerd', 'ok');
+    await loadData();
+  } catch (e) {
+    showToast('Mislukt: ' + e.message, 'err');
+    btn.disabled = false; btn.textContent = 'Desynchroniseren';
+  }
+}
+
+/* ── UTILS ── */
+function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'show'+(type?' '+type:'');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.className=''; }, 3000);
+}
+</script>
+</body>
+</html>

@@ -33,7 +33,7 @@ op lokaal opgeslagen sets (localStorage van `index.html`).
 
 1. Vak:
 ```
-La: 01	Du: 02	Gr: 03	Gs: 04	Na: 04	Sk: 05	Ak: 06	Ne: 07	Bi: 08 Overig: 09
+La: 01	Du: 02	Gr: 03	Gs: 04	Na: 04	Sk: 05	Ak: 06	Ne: 07	Bi: 08
 ```
 
 2. Hoofdstuk/paragraaf
